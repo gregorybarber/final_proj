@@ -121,11 +121,10 @@ void setCamera( void )
 	glRotatef(camRotY, 0, 1, 0);
 }
 
-void drawBox( void )
+void drawBox( GLfloat height, GLfloat width )
 {
       /* draws the sides of a unit cube (0,0,0)-(1,1,1) */
-	GLfloat height = 1.0;
-	GLfloat width = 1.0;
+
     glBegin(GL_POLYGON);/* f1: front */
     { 
       	glNormal3f(-1.0f,0.0f,0.0f);
@@ -221,7 +220,7 @@ public:
 
 Node::Node(GLfloat height, GLfloat width, GLuint start, GLuint stop) {
 	this->height = height;
-	this->height = width;
+	this->width = width;
 	this->start = start;
 	this->stop = stop;
     id = nodeCount++;
@@ -229,6 +228,8 @@ Node::Node(GLfloat height, GLfloat width, GLuint start, GLuint stop) {
 }
 
 Node::Node(const Node& other) {
+	//this->height = other->height;
+	//this->
     id = nodeCount++;
     nodeMap[id] = this;
 }
@@ -252,7 +253,8 @@ void Node::drawSelf() {
     glPushMatrix();
     {
        // glTranslatef(pos[0], pos[1], pos[2]);
-        glutSolidSphere(0.1, 10, 10);
+        drawBox(this->height,this->width);
+        //glutSolidSphere(0.1, 10, 10);
     }
     glPopMatrix();
 
@@ -325,8 +327,12 @@ void drawScene( void )
 		else
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(0);
+		Node *newNode = new Node(2.0,3.0,0,5);
+		//newNode->drawSelf();
+		//delete newNode;
+		drawBox(newNode->height, newNode->width);
 		//glutSolidTeapot(2.5);
-        drawBox();
+        //drawBox();
 		if( isTeapot2_selected )
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		else
@@ -607,14 +613,14 @@ int main (int argc, char *argv[])
 	glutCreateWindow( "Final Project!!!" );
 	setupShaders();
 	setupRC();
-	createObjects();
+	//createObjects();
 
 	glutDisplayFunc( display );
 	glutReshapeFunc( reshape );
 	glutKeyboardFunc( keyboard );
 	glutMouseFunc( mouse );
 	glutMotionFunc( motion );
-    glutTimerFunc(25, update, 0);
+  //  glutTimerFunc(25, update, 0);
 	glutMainLoop();
 	delete shaderProg;
 }
