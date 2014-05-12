@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <map>
 
 #include <GL/glew.h>
 #if defined(_WIN32)
@@ -26,6 +27,7 @@
 #include "GLSLProgram.h"
 #include "SOIL.h"
 
+
 using namespace std;
 
 #define BUFFER_LENGTH 64
@@ -37,6 +39,7 @@ GLdouble modelview[16];
 GLdouble projection[16];
 
 GLuint counter = 0;
+class Node;
 
 GLuint pickedObj = -1;
 char titleString[150];
@@ -70,8 +73,6 @@ static GLint blinnPhongToggle;
 static GLint colorTextureToggle;
 static GLint normalTextureToggle;
 static GLint checkerboardToggle;
-
-
 
 void initLights(void)
 {
@@ -113,8 +114,6 @@ void setupRC()
 	initLights();
 }
 
-
-
 void setCamera( void )
 {
 	glTranslatef(0, 0, camPosZ);
@@ -122,46 +121,11 @@ void setCamera( void )
 	glRotatef(camRotY, 0, 1, 0);
 }
 
-typedef struct sceneObj sceneObj;
-
-struct sceneObj
-{
-	//boolean for box?
-	GLfloat color[4];		//color
-	GLuint start,stop;            //delay the rising of the building
-	GLfloat height,width;
-	//material
-	//shader
-	sceneObj()
-	{
-		color = {0.0f,0.0f,0.0f,0.0f};
-		start = 0;
-		stop = 0;
-		height = 0.0;
-		width = 0.0;
-	}
-	sceneObj(GLfloat objColor, GLuint objStart, GLuint objStop, GLfloat objHeight, GLfloat objWidth)
-	{
-
-
-		
-	}
-} ;
-
-sceneObj *objList[NUM_OBJ]; // SET GLOBAL VARIABLE
-
-void createObjects( void )
-{
-	int i;
-	for (i=0; i<NUM_OBJ; i++) {
-		sceneObj obj = new sceneObj();
-	}
-
-}
-
-void drawBox( GLfloat height, GLfloat width )
+void drawBox( void )
 {
       /* draws the sides of a unit cube (0,0,0)-(1,1,1) */
+	GLfloat height = 1.0;
+	GLfloat width = 1.0;
     glBegin(GL_POLYGON);/* f1: front */
     { 
       	glNormal3f(-1.0f,0.0f,0.0f);
@@ -218,7 +182,96 @@ void drawBox( GLfloat height, GLfloat width )
     glEnd();
 }
 
-drawFloor( void )
+/*typedef struct sceneObj sceneObj;
+
+struct sceneObj
+{
+	//boolean for box?
+	GLfloat color[4];		//color
+	GLuint start,stop;            //delay the rising of the building
+	GLfloat height,width;
+	//material
+	//shader
+	sceneObj()
+	{
+		color = {0.0f,0.0f,0.0f,0.0f};
+		start = 0;
+		stop = 0;
+		height = 0.0;
+		width = 0.0;
+	}
+	sceneObj(GLfloat objColor, GLuint objStart, GLuint objStop, GLfloat objHeight, GLfloat objWidth)
+	{
+	}
+} ;*/
+
+GLuint nodeCount = 0;
+map<GLuint, Node*> nodeMap;
+
+class Node {
+public:
+    Node(GLfloat height=0.0, GLfloat width=0.0, GLuint start=0, 
+         GLuint stop=0); //color?
+    Node(const Node& other);
+    ~Node();
+    void virtual drawSelf();
+    GLfloat height,width;
+    GLuint start, stop, id;
+};
+
+Node::Node(GLfloat height, GLfloat width, GLuint start, GLuint stop) {
+	this->height = height;
+	this->height = width;
+	this->start = start;
+	this->stop = stop;
+    id = nodeCount++;
+    nodeMap[id] = this;
+}
+
+Node::Node(const Node& other) {
+    id = nodeCount++;
+    nodeMap[id] = this;
+}
+
+Node::~Node() {
+    nodeMap.erase(id);
+}
+
+void Node::drawSelf() {
+    GLfloat color1[] = {5.0, 0.0, 0.0, 1};
+
+  //  if (currentNode == this) {
+  //      glColor4fv(selectedColor);
+  //      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, selectedColor);
+  //  }
+  //  else {
+        glColor4fv(color1);
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
+ //   }
+
+    glPushMatrix();
+    {
+       // glTranslatef(pos[0], pos[1], pos[2]);
+        glutSolidSphere(0.1, 10, 10);
+    }
+    glPopMatrix();
+
+}
+
+Node *objList[NUM_OBJ]; // SET GLOBAL VARIABLE
+
+void createObjects( void ) //fix for use with the node map
+{
+	int i;
+	for (i=0; i<NUM_OBJ; i++) {
+		Node *obj = new Node();
+	}
+
+}
+
+
+
+void drawFloor( void )
 {
 	glBegin(GL_QUADS);
     	glVertex3f(10000,-2,-10000);
@@ -226,8 +279,6 @@ drawFloor( void )
     	glVertex3f(-10000,-2,10000);
     	glVertex3f(10000,-2,10000);
     glEnd();
-
-
 }
 
 void setShadeParam( void ) //give parameters as toggle and light direction
@@ -532,9 +583,9 @@ void motion(int x, int y)
 void update (int value)
 {
 	int i = 0;
-	while(!objList[i] == NULL) {
-		if (stop > counter && counter > objList[i]-->start) {
-			objList[i]-->height+= .05;
+	while(nodeMap[i] != NULL) {
+		if (nodeMap[i]->stop > counter && counter > nodeMap[i]->start) {
+			nodeMap[i]->height+= .05;
 		}
 		i++;
 	}
