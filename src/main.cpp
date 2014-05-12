@@ -64,6 +64,7 @@ static GLSLProgram*     shaderProg = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
+const char* window_file = "textures/windows.png";
 
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
@@ -323,15 +324,15 @@ float randFloat(const float& min, const float& max) {
 
 void createObjects( void ) 
 {
-	Node *nodeOne = new Node(0.0f,0.0f,0.0f,12.0f,3.0f,0,0.3f);
-	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,2,0.2f);
-	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,5,0.1f);
-	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,2,0.4f);
-	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,0,0.2f);
-	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,6,0.5f);
-	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,3,0.3f);
-	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,5,0.2f);
-	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,4,0.4f);
+	Node *nodeOne = new Node(0.0f,0.0f,0.0f,12.0f,3.0f,0,0.06f);
+	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,50,0.04f);
+	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,75,0.02f);
+	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,100,0.08f);
+	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,60,0.04f);
+	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,150,0.10f);
+	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.06f);
+	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.04f);
+	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
 	int i;
 	for(size_t i=0; i < nodeMap.size(); i++) {
 		nodeMap[i]->drawSelf();
@@ -464,7 +465,7 @@ static void setupShaders()
 	normalTextureToggle = 0;
 
 	glActiveTexture(GL_TEXTURE0);
-	normal_texture_id = SOIL_load_OGL_texture(normal_file, 
+	normal_texture_id = SOIL_load_OGL_texture(window_file, 
 		                               SOIL_LOAD_AUTO,
 		                               SOIL_CREATE_NEW_ID,
 		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
@@ -653,8 +654,21 @@ void motion(int x, int y)
 void update(int value)
 {
 	counter++;
+
+	//SET DIFF CAMERA POSITIONS AND CONDITIONS
+	if (camRotX > 730) {
+		camRotX-= .09;
+	//	camRotY+= .3;
+	}
+	if (camRotY < 692) {
+		camRotY+= .05;
+		//camPosZ += .2;
+	}
+	if (camPosZ < -23) {
+		camPosZ +=.05;
+	}
 	display();
-	glutTimerFunc(200, update, 0);
+	glutTimerFunc(25, update, 0);
 }
 
 
@@ -678,7 +692,7 @@ int main (int argc, char *argv[])
 	glutKeyboardFunc( keyboard );
 	glutMouseFunc( mouse );
 	glutMotionFunc( motion );
-    glutTimerFunc(200, update, 0);
+    glutTimerFunc(25, update, 0);
 	glutMainLoop();
 	delete shaderProg;
 }
