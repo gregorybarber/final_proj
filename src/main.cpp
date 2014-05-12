@@ -38,7 +38,7 @@ GLint viewport[4];
 GLdouble modelview[16];
 GLdouble projection[16];
 
-GLuint counter = 0;
+GLint counter = 0;
 class Node;
 
 GLuint pickedObj = -1;
@@ -79,7 +79,7 @@ void initLights(void)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
-	
+
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, mat_diffuse);
@@ -89,7 +89,7 @@ void initLights(void)
 	glLightfv(GL_LIGHT1, GL_POSITION, light1_pos);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_dif);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_spe);
-	
+
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -99,14 +99,14 @@ void setupRC()
 {
 	tbInit(GLUT_RIGHT_BUTTON);
 	tbAnimate(GL_TRUE);
-	
+
 	// Place Camera
 	camRotX = 750.0f;  //350, 800 was about vertical looking down
 	camRotY = 680.0f; //680
 	camPosX = 0.0f;
 	camPosY = 0.0f;
 	camPosZ = -30.5f;   //-10.5
-	
+
 	glEnable(GL_DEPTH_TEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
@@ -181,55 +181,57 @@ void drawBox( GLfloat height, GLfloat width )
     glEnd();
 }
 
-/*typedef struct sceneObj sceneObj;
+class Position {
+public:
+    Position(GLfloat x=0, GLfloat y=0, GLfloat z=0);
+    Position(Position& other);
+    GLfloat operator[](size_t i) { return pos[i]; }
+    GLfloat pos[3];
+};
 
-struct sceneObj
-{
-	//boolean for box?
-	GLfloat color[4];		//color
-	GLuint start,stop;            //delay the rising of the building
-	GLfloat height,width;
-	//material
-	//shader
-	sceneObj()
-	{
-		color = {0.0f,0.0f,0.0f,0.0f};
-		start = 0;
-		stop = 0;
-		height = 0.0;
-		width = 0.0;
-	}
-	sceneObj(GLfloat objColor, GLuint objStart, GLuint objStop, GLfloat objHeight, GLfloat objWidth)
-	{
-	}
-} ;*/
+Position::Position(GLfloat x, GLfloat y, GLfloat z) {
+    pos[0] = x;
+    pos[1] = y;
+    pos[2] = z;
+}
+
+Position::Position(Position& other) {
+    pos[0] = other.pos[0];
+    pos[1] = other.pos[1];
+    pos[2] = other.pos[2];
+}
 
 GLuint nodeCount = 0;
 map<GLuint, Node*> nodeMap;
 
 class Node {
 public:
-    Node(GLfloat height=0.0, GLfloat width=0.0, GLuint start=0, 
-         GLuint stop=0); //color?
+    Node(GLfloat x = 0, GLfloat y = 0, GLfloat z = 0, GLfloat height=0.0, 
+    GLfloat width=0.0, GLuint start=0, GLfloat rate=0.0); //color?
     Node(const Node& other);
     ~Node();
     void virtual drawSelf();
-    GLfloat height,width;
-    GLuint start, stop, id;
+    GLfloat height,width,rate;
+    GLuint start, id;
+    Position pos;
 };
 
-Node::Node(GLfloat height, GLfloat width, GLuint start, GLuint stop) {
+Node::Node(GLfloat x, GLfloat y, GLfloat z, GLfloat height, GLfloat width, GLuint start, GLfloat rate): pos(x, y, z) {
+	this->pos = pos;
 	this->height = height;
 	this->width = width;
 	this->start = start;
-	this->stop = stop;
+	this->rate = rate;
     id = nodeCount++;
     nodeMap[id] = this;
 }
 
 Node::Node(const Node& other) {
-	//this->height = other->height;
-	//this->
+	pos = other.pos;
+	width = other.width;
+	height = other.height;
+	start = other.start;
+	rate = other.rate;
     id = nodeCount++;
     nodeMap[id] = this;
 }
@@ -240,7 +242,7 @@ Node::~Node() {
 
 void Node::drawSelf() {
     GLfloat color1[] = {5.0, 0.0, 0.0, 1};
-
+    GLfloat currHeight = height;
   //  if (currentNode == this) {
   //      glColor4fv(selectedColor);
   //      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, selectedColor);
@@ -249,28 +251,20 @@ void Node::drawSelf() {
         glColor4fv(color1);
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
  //   }
-
-    glPushMatrix();
-    {
-       // glTranslatef(pos[0], pos[1], pos[2]);
-        drawBox(this->height,this->width);
-        //glutSolidSphere(0.1, 10, 10);
-    }
-    glPopMatrix();
-
-}
-
-Node *objList[NUM_OBJ]; // SET GLOBAL VARIABLE
-
-void createObjects( void ) //fix for use with the node map
-{
-	int i;
-	for (i=0; i<NUM_OBJ; i++) {
-		Node *obj = new Node();
-	}
+    if (counter > start) {
+    	currHeight = (counter-start)*rate;
+    	if (currHeight > height)
+    		currHeight = height;
+    	glPushMatrix();
+    	{
+    	    glTranslatef(pos[0], pos[1], pos[2]);
+    	    drawBox(currHeight,width);
+   	     //glutSolidSphere(0.1, 10, 10);
+   		 }
+   	 glPopMatrix();
+   	}
 
 }
-
 
 
 void drawFloor( void )
@@ -303,19 +297,36 @@ float randFloat(const float& min, const float& max) {
     return (num + min);
 }
 
+void createObjects( void ) 
+{
+	GLfloat height = (GLfloat)counter*.1;
+	Node *nodeOne = new Node(0.0f,0.0f,0.0f,10.0f,3.0f,0,0.3f);
+	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,2,0.2f);
+	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,5,0.1f);
+	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,2.0f,2.0f,2,0.4f);
+	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,0,0.2f);
+	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,6,0.5f);
+	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,8.0f,2.0f,3,0.3f);
+	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,5,0.2f);
+	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,10.0f,3.0f,4,0.4f);
+	int i;
+	for(size_t i=0; i < nodeMap.size(); i++) {
+		nodeMap[i]->drawSelf();
+	}
 
+}
 void drawScene( void )
 {
 	float currentColor[4];
 	glGetFloatv(GL_CURRENT_COLOR, currentColor);
-	
+
 	GLfloat selectedColor[] = {0, 1, 0, 1};
 	GLfloat unselectedColor[] = {1, 0, 0, 1};
 
 	// Initialize the name stack
 	glInitNames();
 	glPushName(0);
-	
+
 	setShadeParam();
 
 	// Draw two teapots next to each other in z axis
@@ -327,10 +338,14 @@ void drawScene( void )
 		else
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(0);
-		Node *newNode = new Node(2.0,3.0,0,5);
+		//Node *newNode = new Node(2.0,3.0,0,5);
 		//newNode->drawSelf();
 		//delete newNode;
-		drawBox(newNode->height, newNode->width);
+	//	int i;
+		createObjects();
+		//for (i = 0; i<1; i++) {
+	//			nodeMap[i]->drawSelf();
+	//	}
 		//glutSolidTeapot(2.5);
         //drawBox();
 		if( isTeapot2_selected )
@@ -338,12 +353,12 @@ void drawScene( void )
 		else
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(1);
-		glTranslatef(0,0,5);
-		glutSolidTeapot(1.5);
+	//	glTranslatef(0,0,5);
+	//	glutSolidTeapot(1.5);
 	}
 	glPopMatrix();
 	shaderProg->disable();
-	
+
 	glColor4fv(currentColor);
 
 }
@@ -351,15 +366,15 @@ void drawScene( void )
 void display( void )
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
+
 	glPushMatrix();
 	{
-	
+
 		setCamera();
 		tbMatrix();
-		
+
 		drawScene();
-		
+
 		// Retrieve current matrice before they popped.
 		glGetDoublev( GL_MODELVIEW_MATRIX, modelview );        // Retrieve The Modelview Matrix
 		glGetDoublev( GL_PROJECTION_MATRIX, projection );    // Retrieve The Projection Matrix
@@ -379,10 +394,10 @@ void reshape( int w, int h )
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	
+
 	// Set the clipping volume
 	gluPerspective(45.0f, (GLfloat)w / (GLfloat)h, 1.0f, 100.0f);
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -403,7 +418,7 @@ static void setupShaders()
 		fprintf(stderr, "Required OpenGL extensions missing\n");
 		exit(2);
 	}
-	
+
 	shaderProg = new GLSLProgram(generalVS, generalFS);
 
 	gouraudToggle = 1;
@@ -473,97 +488,97 @@ void keyboard( unsigned char key, int x, int y )
 void processSelection(int xPos, int yPos)
 {
 	GLfloat fAspect;
-	
+
 	// Space for selection buffer
 	static GLuint selectBuff[BUFFER_LENGTH];
-	
+
 	// Hit counter and viewport storage
 	GLint hits, viewport[4];
-	
+
 	// Setup selection buffer
 	glSelectBuffer(BUFFER_LENGTH, selectBuff);
-	
+
 	// Get the viewport
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	
+
 	// Switch to projection and save the matrix
 	glMatrixMode(GL_PROJECTION);
-	
+
 	glPushMatrix();
 	{
 		// Change render mode
 		glRenderMode(GL_SELECT);
-		
+
 		// Establish new clipping volume to be unit cube around
 		// mouse cursor point (xPos, yPos) and extending two pixels
 		// in the vertical and horizontal direction
 		glLoadIdentity();
 		gluPickMatrix(xPos, viewport[3] - yPos + viewport[1], 0.1,0.1, viewport);
-		
+
 		// Apply perspective matrix 
 		fAspect = (float)viewport[2] / (float)viewport[3];
 		gluPerspective(45.0f, fAspect, 1.0, 425.0);
-		
-		
+
+
 		// Render only those needed for selection
 		glPushMatrix();    
 		{
 			setCamera();
 			tbMatrixForSelection();
-			
+
 			drawScene();
 		}
 		glPopMatrix();
-		
-		
+
+
 		// Collect the hits
 		hits = glRenderMode(GL_RENDER);
-		
+
 		isTeapot1_selected = false;
 		isTeapot2_selected = false;
-		
+
 		// If hit(s) occurred, display the info.
 		if(hits != 0)
 		{
-		
+
 			// Save current picked object.
 			// Take only the nearest selection
 			pickedObj = selectBuff[3];
-			
+
 			sprintf (titleString, "You clicked on %d", pickedObj);
 			glutSetWindowTitle(titleString);
-			
+
 			if (pickedObj == 0) {
 				isTeapot1_selected = true;
 			}
-			
+
 			if (pickedObj == 1) {
 				isTeapot2_selected = true;
 			}
-			
+
 		}
 		else
 			glutSetWindowTitle("Nothing was clicked on!");
-		
-		
+
+
 		// Restore the projection matrix
 		glMatrixMode(GL_PROJECTION);
 	}
 	glPopMatrix();
-	
+
 	// Go back to modelview for normal rendering
 	glMatrixMode(GL_MODELVIEW);
-	
+
 	glutPostRedisplay();
 }
 
 void mouse( int button, int state, int x, int y)
 {
 	tbMouse(button, state, x, y);
-	
+
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		processSelection(x, y);
-	
+
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_UP)
 	{
 		pickedObj = -1;
@@ -574,10 +589,10 @@ void mouse( int button, int state, int x, int y)
 void motion(int x, int y)
 {
 	tbMotion(x, y);
-	
+
 	GLfloat winX, winY, winZ;
 	GLdouble posX, posY, posZ;
-	
+
 	winX = (float)x;
 	winY = (float)viewport[3] - (float)y;
 	glReadPixels( x, (int)winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
@@ -586,17 +601,24 @@ void motion(int x, int y)
 
 }
 
-void update (int value)
+/*void update (int value)
 {
 	int i = 0;
 	while(nodeMap[i] != NULL) {
-		if (nodeMap[i]->stop > counter && counter > nodeMap[i]->start) {
+		if (counter > nodeMap[i]->start) {
 			nodeMap[i]->height+= .05;
 		}
 		i++;
 	}
 	glutPostRedisplay();
-	glutTimerFunc(25,update,0);
+	glutTimerFunc(200,update,0);
+}*/
+
+void update(int value)
+{
+	counter++;
+	display();
+	glutTimerFunc(200, update, 0);
 }
 
 
@@ -620,7 +642,7 @@ int main (int argc, char *argv[])
 	glutKeyboardFunc( keyboard );
 	glutMouseFunc( mouse );
 	glutMotionFunc( motion );
-  //  glutTimerFunc(25, update, 0);
+    glutTimerFunc(200, update, 0);
 	glutMainLoop();
 	delete shaderProg;
 }
