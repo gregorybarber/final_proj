@@ -128,54 +128,78 @@ void drawBox( GLfloat height, GLfloat width )
     glBegin(GL_POLYGON);/* f1: front */
     { 
       	glNormal3f(-1.0f,0.0f,0.0f);
+      	glTexCoord2f (0.0, 0.0);
         glVertex3f(0.0f,0.0f,0.0f);
+        glTexCoord2f (1.0, 0.0);
         glVertex3f(0.0f,0.0f,width);
+        glTexCoord2f (1.0, 1.0);
         glVertex3f(width,0.0f,width);
+        glTexCoord2f (0.0, 1.0);
         glVertex3f(width,0.0f,0.0f);
     }
     glEnd();
     glBegin(GL_POLYGON);/* f2: bottom */
     {
         glNormal3f(0.0f,0.0f,-1.0f);
+        glTexCoord2f (0.0, 0.0);
         glVertex3f(0.0f,0.0f,0.0f);
+        glTexCoord2f (1.0, 0.0);
         glVertex3f(width,0.0f,0.0f);
+        glTexCoord2f (1.0, 1.0);
         glVertex3f(width,height,0.0f);
+        glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,0.0f);
     }
     glEnd();
     glBegin(GL_POLYGON);/* f3:back */
     { 
         glNormal3f(1.0f,0.0f,0.0f);
+        glTexCoord2f (0.0, 0.0);
         glVertex3f(width,height,0.0f);
+         glTexCoord2f (1.0, 0.0);
         glVertex3f(width,height,width);
+         glTexCoord2f (1.0, 1.0);
         glVertex3f(0.0f,height,width);
+         glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,0.0f);
     }
     glEnd();
     glBegin(GL_POLYGON);/* f4: top */
     {
         glNormal3f(0.0f,0.0f,1.0f);
+         glTexCoord2f (0.0, 0.0);
         glVertex3f(width,height,width);
+         glTexCoord2f (1.0, 0.0);
         glVertex3f(width,0.0f,width);
+         glTexCoord2f (1.0, 1.0);
         glVertex3f(0.0f,0.0f,width);
+         glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,width);
     }
     glEnd();
     glBegin(GL_POLYGON);/* f5: left */
     {
         glNormal3f(0.0f,1.0,0.0f);
+        glTexCoord2f (0.0, 0.0);
         glVertex3f(0.0f,0.0f,0.0f);
+        glTexCoord2f (1.0, 0.0);
         glVertex3f(0.0f,height,0.0f);
+        glTexCoord2f (1.0, 1.0);
         glVertex3f(0.0f,height,width);
+        glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,0.0f,width);
     }
     glEnd();
     glBegin(GL_POLYGON);/* f6: right */
     {
-		glNormal3f(0.0f,-1.0,0.0f); //neg?
+		glNormal3f(0.0f,-1.0,0.0f); 
+		glTexCoord2f (0.0, 0.0);
         glVertex3f(width,0.0f,0.0f);
+        glTexCoord2f (1.0, 0.0);
         glVertex3f(width,0.0f,width);
+        glTexCoord2f (1.0, 1.0);
         glVertex3f(width,height,width);
+        glTexCoord2f (0.0, 1.0);
         glVertex3f(width,height,0.0f);
     }
     glEnd();
@@ -270,10 +294,10 @@ void Node::drawSelf() {
 void drawFloor( void )
 {
 	glBegin(GL_QUADS);
-    	glVertex3f(10000,-2,-10000);
-    	glVertex3f(-10000,-2,-10000);
-    	glVertex3f(-10000,-2,10000);
-    	glVertex3f(10000,-2,10000);
+    	glVertex3f(10000,0,-10000);
+    	glVertex3f(-10000,0,-10000);
+    	glVertex3f(-10000,0,10000);
+    	glVertex3f(10000,0,10000);
     glEnd();
 }
 
@@ -299,22 +323,23 @@ float randFloat(const float& min, const float& max) {
 
 void createObjects( void ) 
 {
-	GLfloat height = (GLfloat)counter*.1;
-	Node *nodeOne = new Node(0.0f,0.0f,0.0f,10.0f,3.0f,0,0.3f);
+	Node *nodeOne = new Node(0.0f,0.0f,0.0f,12.0f,3.0f,0,0.3f);
 	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,2,0.2f);
 	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,5,0.1f);
-	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,2.0f,2.0f,2,0.4f);
+	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,2,0.4f);
 	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,0,0.2f);
 	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,6,0.5f);
-	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,8.0f,2.0f,3,0.3f);
+	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,3,0.3f);
 	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,5,0.2f);
-	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,10.0f,3.0f,4,0.4f);
+	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,4,0.4f);
 	int i;
 	for(size_t i=0; i < nodeMap.size(); i++) {
 		nodeMap[i]->drawSelf();
 	}
-
 }
+
+
+
 void drawScene( void )
 {
 	float currentColor[4];
@@ -342,6 +367,17 @@ void drawScene( void )
 		//newNode->drawSelf();
 		//delete newNode;
 	//	int i;
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
+		createObjects();
+		glTranslatef(0.0,0.0,10.0);
+		createObjects();
+		glTranslatef(10.0,0.0,-10.0);
+		createObjects();
+		glTranslatef(10.0,0.0,10.0);
+		createObjects();
+		//mult = 2.0;
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
+		glTranslatef(20.0,0.0,10.0);
 		createObjects();
 		//for (i = 0; i<1; i++) {
 	//			nodeMap[i]->drawSelf();
