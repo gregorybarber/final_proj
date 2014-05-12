@@ -29,11 +29,14 @@
 using namespace std;
 
 #define BUFFER_LENGTH 64
+#define NUM_OBJ 5
 
 GLfloat camRotX, camRotY, camPosX, camPosY, camPosZ;
 GLint viewport[4];
 GLdouble modelview[16];
 GLdouble projection[16];
+
+GLuint counter = 0;
 
 GLuint pickedObj = -1;
 char titleString[150];
@@ -68,6 +71,8 @@ static GLint colorTextureToggle;
 static GLint normalTextureToggle;
 static GLint checkerboardToggle;
 
+
+
 void initLights(void)
 {
 	glEnable(GL_LIGHTING);
@@ -95,11 +100,11 @@ void setupRC()
 	tbAnimate(GL_TRUE);
 	
 	// Place Camera
-	camRotX = 350.0f;
-	camRotY = 680.0f;
+	camRotX = 750.0f;  //350, 800 was about vertical looking down
+	camRotY = 680.0f; //680
 	camPosX = 0.0f;
 	camPosY = 0.0f;
-	camPosZ = -10.5f;
+	camPosZ = -30.5f;   //-10.5
 	
 	glEnable(GL_DEPTH_TEST);
 	glShadeModel(GL_SMOOTH);
@@ -108,6 +113,8 @@ void setupRC()
 	initLights();
 }
 
+
+
 void setCamera( void )
 {
 	glTranslatef(0, 0, camPosZ);
@@ -115,7 +122,136 @@ void setCamera( void )
 	glRotatef(camRotY, 0, 1, 0);
 }
 
-void drawSelectableTeapots( void )
+typedef struct sceneObj sceneObj;
+
+struct sceneObj
+{
+	//boolean for box?
+	GLfloat color[4];		//color
+	GLuint start,stop;            //delay the rising of the building
+	GLfloat height,width;
+	//material
+	//shader
+	sceneObj()
+	{
+		color = {0.0f,0.0f,0.0f,0.0f};
+		start = 0;
+		stop = 0;
+		height = 0.0;
+		width = 0.0;
+	}
+	sceneObj(GLfloat objColor, GLuint objStart, GLuint objStop, GLfloat objHeight, GLfloat objWidth)
+	{
+
+
+		
+	}
+} ;
+
+sceneObj *objList[NUM_OBJ]; // SET GLOBAL VARIABLE
+
+void createObjects( void )
+{
+	int i;
+	for (i=0; i<NUM_OBJ; i++) {
+		sceneObj obj = new sceneObj();
+	}
+
+}
+
+void drawBox( GLfloat height, GLfloat width )
+{
+      /* draws the sides of a unit cube (0,0,0)-(1,1,1) */
+    glBegin(GL_POLYGON);/* f1: front */
+    { 
+      	glNormal3f(-1.0f,0.0f,0.0f);
+        glVertex3f(0.0f,0.0f,0.0f);
+        glVertex3f(0.0f,0.0f,width);
+        glVertex3f(width,0.0f,width);
+        glVertex3f(width,0.0f,0.0f);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f2: bottom */
+    {
+        glNormal3f(0.0f,0.0f,-1.0f);
+        glVertex3f(0.0f,0.0f,0.0f);
+        glVertex3f(width,0.0f,0.0f);
+        glVertex3f(width,height,0.0f);
+        glVertex3f(0.0f,height,0.0f);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f3:back */
+    { 
+        glNormal3f(1.0f,0.0f,0.0f);
+        glVertex3f(width,height,0.0f);
+        glVertex3f(width,height,width);
+        glVertex3f(0.0f,height,width);
+        glVertex3f(0.0f,height,0.0f);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f4: top */
+    {
+        glNormal3f(0.0f,0.0f,1.0f);
+        glVertex3f(width,height,width);
+        glVertex3f(width,0.0f,width);
+        glVertex3f(0.0f,0.0f,width);
+        glVertex3f(0.0f,height,width);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f5: left */
+    {
+        glNormal3f(0.0f,1.0,0.0f);
+        glVertex3f(0.0f,0.0f,0.0f);
+        glVertex3f(0.0f,height,0.0f);
+        glVertex3f(0.0f,height,width);
+        glVertex3f(0.0f,0.0f,width);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f6: right */
+    {
+		glNormal3f(0.0f,-1.0,0.0f); //neg?
+        glVertex3f(width,0.0f,0.0f);
+        glVertex3f(width,0.0f,width);
+        glVertex3f(width,height,width);
+        glVertex3f(width,height,0.0f);
+    }
+    glEnd();
+}
+
+drawFloor( void )
+{
+	glBegin(GL_QUADS);
+    	glVertex3f(10000,-2,-10000);
+    	glVertex3f(-10000,-2,-10000);
+    	glVertex3f(-10000,-2,10000);
+    	glVertex3f(10000,-2,10000);
+    glEnd();
+
+
+}
+
+void setShadeParam( void ) //give parameters as toggle and light direction
+{
+	shaderProg->enable();
+	shaderProg->set_uniform_3f("lightDir", 2.0f, 1.0f, 3.0f);
+	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->set_uniform_1i("gouraudToggle", gouraudToggle);
+	shaderProg->set_uniform_1i("blinnPhongToggle", blinnPhongToggle);
+	shaderProg->set_uniform_1i("checkerboardToggle", checkerboardToggle);
+	shaderProg->set_uniform_1i("colorTextureToggle", colorTextureToggle);
+	shaderProg->set_uniform_1i("normalTextureToggle", normalTextureToggle);
+}
+
+
+float randFloat(const float& min, const float& max) {
+    float range = max - min;
+    float num = range * rand() / RAND_MAX;
+    return (num + min);
+}
+
+
+void drawScene( void )
 {
 	float currentColor[4];
 	glGetFloatv(GL_CURRENT_COLOR, currentColor);
@@ -127,26 +263,19 @@ void drawSelectableTeapots( void )
 	glInitNames();
 	glPushName(0);
 	
-	shaderProg->enable();
-	shaderProg->set_uniform_3f("lightDir", 2.0f, 1.0f, 3.0f);
-	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-	shaderProg->set_uniform_1i("gouraudToggle", gouraudToggle);
-	shaderProg->set_uniform_1i("blinnPhongToggle", blinnPhongToggle);
-	shaderProg->set_uniform_1i("checkerboardToggle", checkerboardToggle);
-	shaderProg->set_uniform_1i("colorTextureToggle", colorTextureToggle);
-	shaderProg->set_uniform_1i("normalTextureToggle", normalTextureToggle);
+	setShadeParam();
+
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
-	
+		drawFloor();
 		if( isTeapot1_selected )
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		else
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(0);
-		glutSolidTeapot(2.5);
-
+		//glutSolidTeapot(2.5);
+        drawBox();
 		if( isTeapot2_selected )
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		else
@@ -172,7 +301,7 @@ void display( void )
 		setCamera();
 		tbMatrix();
 		
-		drawSelectableTeapots();
+		drawScene();
 		
 		// Retrieve current matrice before they popped.
 		glGetDoublev( GL_MODELVIEW_MATRIX, modelview );        // Retrieve The Modelview Matrix
@@ -325,7 +454,7 @@ void processSelection(int xPos, int yPos)
 			setCamera();
 			tbMatrixForSelection();
 			
-			drawSelectableTeapots();
+			drawScene();
 		}
 		glPopMatrix();
 		
@@ -400,6 +529,21 @@ void motion(int x, int y)
 
 }
 
+void update (int value)
+{
+	int i = 0;
+	while(!objList[i] == NULL) {
+		if (stop > counter && counter > objList[i]-->start) {
+			objList[i]-->height+= .05;
+		}
+		i++;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(25,update,0);
+}
+
+
+
 int main (int argc, char *argv[])
 {
 	int win_width = 960;
@@ -409,16 +553,17 @@ int main (int argc, char *argv[])
 	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize( win_width, win_height );
 
-	glutCreateWindow( "Opengl demo" );
+	glutCreateWindow( "Final Project!!!" );
 	setupShaders();
 	setupRC();
+	createObjects();
 
 	glutDisplayFunc( display );
 	glutReshapeFunc( reshape );
 	glutKeyboardFunc( keyboard );
 	glutMouseFunc( mouse );
 	glutMotionFunc( motion );
-
+    glutTimerFunc(25, update, 0);
 	glutMainLoop();
 	delete shaderProg;
 }

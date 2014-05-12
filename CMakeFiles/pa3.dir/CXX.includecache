@@ -6,15 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/Users/gregorybarber/Desktop/final_project/src/GLSLProgram.cpp
-GLSLProgram.h
-/Users/gregorybarber/Desktop/final_project/src/GLSLProgram.h
-assert.h
--
-utils/macros.h
-/Users/gregorybarber/Desktop/final_project/src/utils/macros.h
-
-/Users/gregorybarber/Desktop/final_project/src/GLSLProgram.h
+/Users/gregorybarber/Desktop/final_proj/src/GLSLProgram.h
 cstdio
 -
 cstdlib
@@ -22,25 +14,7 @@ cstdlib
 GL/glew.h
 -
 
-/Users/gregorybarber/Desktop/final_project/src/GLScreenCapturer.cpp
-GLScreenCapturer.h
-/Users/gregorybarber/Desktop/final_project/src/GLScreenCapturer.h
-cstring
--
-cstdarg
--
-cstdlib
--
-GLUT/glut.h
--
-GL/glut.h
--
-fstream
--
-utils/macros.h
-/Users/gregorybarber/Desktop/final_project/src/utils/macros.h
-
-/Users/gregorybarber/Desktop/final_project/src/GLScreenCapturer.h
+/Users/gregorybarber/Desktop/final_proj/src/GLScreenCapturer.h
 stdint.h
 -
 OpenGL/gl.h
@@ -48,7 +22,7 @@ OpenGL/gl.h
 GL/glut.h
 -
 
-/Users/gregorybarber/Desktop/final_project/src/main.cpp
+/Users/gregorybarber/Desktop/final_proj/src/main.cpp
 stdlib.h
 -
 stdio.h
@@ -64,45 +38,23 @@ GLUT/glut.h
 GL/glut.h
 -
 GLScreenCapturer.h
-/Users/gregorybarber/Desktop/final_project/src/GLScreenCapturer.h
+/Users/gregorybarber/Desktop/final_proj/src/GLScreenCapturer.h
 trackball.h
-/Users/gregorybarber/Desktop/final_project/src/trackball.h
+/Users/gregorybarber/Desktop/final_proj/src/trackball.h
 shader.h
-/Users/gregorybarber/Desktop/final_project/src/shader.h
+/Users/gregorybarber/Desktop/final_proj/src/shader.h
 GLSLProgram.h
-/Users/gregorybarber/Desktop/final_project/src/GLSLProgram.h
+/Users/gregorybarber/Desktop/final_proj/src/GLSLProgram.h
 SOIL.h
-/Users/gregorybarber/Desktop/final_project/src/SOIL.h
+/Users/gregorybarber/Desktop/final_proj/src/SOIL.h
 
-/Users/gregorybarber/Desktop/final_project/src/shader.h
+/Users/gregorybarber/Desktop/final_proj/src/shader.h
 
-/Users/gregorybarber/Desktop/final_project/src/trackball.cpp
+/Users/gregorybarber/Desktop/final_proj/src/trackball.h
 GLUT/glut.h
 -
 GL/glut.h
 -
-math.h
--
-assert.h
--
-trackball.h
-/Users/gregorybarber/Desktop/final_project/src/trackball.h
-
-/Users/gregorybarber/Desktop/final_project/src/trackball.h
-GLUT/glut.h
--
-GL/glut.h
--
-
-/Users/gregorybarber/Desktop/final_project/src/utils/macros.h
-stdio.h
--
-stdlib.h
--
-assert.h
--
-conts-config.h
-/Users/gregorybarber/Desktop/final_project/src/utils/conts-config.h
 
 src/soil/SOIL.h
 

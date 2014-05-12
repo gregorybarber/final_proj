@@ -50,10 +50,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = "/Applications/CMake 2.8-12.app/Contents/bin/ccmake"
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/gregorybarber/Desktop/final_project
+CMAKE_SOURCE_DIR = /Users/gregorybarber/Desktop/final_proj
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/gregorybarber/Desktop/final_project
+CMAKE_BINARY_DIR = /Users/gregorybarber/Desktop/final_proj
 
 #=============================================================================
 # Target rules for target CMakeFiles/pa3.dir
@@ -62,7 +62,7 @@ CMAKE_BINARY_DIR = /Users/gregorybarber/Desktop/final_project
 CMakeFiles/pa3.dir/all:
 	$(MAKE) -f CMakeFiles/pa3.dir/build.make CMakeFiles/pa3.dir/depend
 	$(MAKE) -f CMakeFiles/pa3.dir/build.make CMakeFiles/pa3.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /Users/gregorybarber/Desktop/final_project/CMakeFiles  1 2 3 4 5 6 7 8
+	$(CMAKE_COMMAND) -E cmake_progress_report /Users/gregorybarber/Desktop/final_proj/CMakeFiles  1 2 3 4 5 6 7 8
 	@echo "Built target pa3"
 .PHONY : CMakeFiles/pa3.dir/all
 
@@ -72,9 +72,9 @@ all: CMakeFiles/pa3.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/pa3.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/gregorybarber/Desktop/final_project/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/gregorybarber/Desktop/final_proj/CMakeFiles 8
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/pa3.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/gregorybarber/Desktop/final_project/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/gregorybarber/Desktop/final_proj/CMakeFiles 0
 .PHONY : CMakeFiles/pa3.dir/rule
 
 # Convenience name for target.
