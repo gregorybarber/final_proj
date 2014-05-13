@@ -74,7 +74,7 @@ static GLSLProgram* windowShader = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
-const char* window_file = "textures/windows2.png";
+const char* window_file = "textures/windows.png";
 
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
@@ -157,9 +157,9 @@ void drawBox( GLfloat height, GLfloat width )
     glBegin(GL_POLYGON);/* f2: BACK */
     {
         glNormal3f(0.0f,0.0f,-1.0f);
-        glTexCoord2f (0.0, 0.0);
+        glTexCoord2f (0.0, 1 - (height / width));
         glVertex3f(0.0f,0.0f,0.0f);
-        glTexCoord2f (1.0, 0.0);
+        glTexCoord2f (1.0, 1 - (height / width));
         glVertex3f(width,0.0f,0.0f);
         glTexCoord2f (1.0, 1.0);
         glVertex3f(width,height,0.0f);
@@ -185,11 +185,11 @@ void drawBox( GLfloat height, GLfloat width )
         glNormal3f(0.0f,1.0,0.0f);
 		glTexCoord2f (0.0, -(height / width));
         glVertex3f(0.0f,0.0f,0.0f);
-        glTexCoord2f (0.0, 1.0);
+        glTexCoord2f (0.0, 0.0);
         glVertex3f(0.0f,height,0.0f);
-        glTexCoord2f (0.0, height);
+        glTexCoord2f (1.0, 0.0);
         glVertex3f(0.0f,height,width);
-        glTexCoord2f (0.0,0.0);
+        glTexCoord2f (1.0, -(height / width));
         glVertex3f(0.0f,0.0f,width);
     }
     glEnd();
@@ -211,9 +211,9 @@ void drawBox( GLfloat height, GLfloat width )
         glNormal3f(1.0f,0.0f,0.0f);
         glTexCoord2f (0.0, 0.0);
         glVertex3f(width,height,0.0f);
-         glTexCoord2f (1.0, 0.0);
+         glTexCoord2f (0.0, 0.0);
         glVertex3f(width,height,width);
-         glTexCoord2f (1.0, 1.0);
+         glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,width);
          glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,0.0f);
@@ -919,14 +919,14 @@ void mouse( int button, int state, int x, int y)
 {
 	tbMouse(button, state, x, y);
 
-	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-		processSelection(x, y);
+	// if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	// 	processSelection(x, y);
 
-	if(button == GLUT_LEFT_BUTTON && state == GLUT_UP)
-	{
-		pickedObj = -1;
-		glutPostRedisplay();
-	}
+	// if(button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+	// {
+	// 	pickedObj = -1;
+	// 	glutPostRedisplay();
+	// }
 }
 
 void motion(int x, int y)
