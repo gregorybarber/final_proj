@@ -362,7 +362,6 @@ void createObjects( void )
 	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
 	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.09f);
 	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
-<<<<<<< HEAD
 
     Node *nodeTen = new Node(0.0f,0.0f,0.0f,2.0f,3.0f,50,0.04f);
     Node *nodeElev = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,100,0.02f);
@@ -373,10 +372,9 @@ void createObjects( void )
     Node *nodeSixt = new Node(-7.5f,0.0f,2.5f,4.0f,2.0f,150,0.04f);
     Node *nodeSevent = new Node(-5.0f,0.0f,2.5f,5.0f,3.0f,120,0.05f);
     Node *nodeEighte = new Node(-5.0f,0.0f,-5.0f,3.0f,3.0f,70,0.06f);	
-=======
+
 	
 	initSky();
->>>>>>> df7928fd0b40e849e1e50b86d931034fb5869b29
 }
 
 void drawTallObjects( void ) 
