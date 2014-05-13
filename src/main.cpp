@@ -42,8 +42,13 @@ GLdouble projection[16];
 GLint counter = 0;
 class Node;
 
-int season = 3;
+int season = 2;
 int angle = 0;
+
+GLfloat redGlobal = 134;
+GLfloat greenGlobal = 189;
+GLfloat blueGlobal = 75;
+
 
 
 GLuint pickedObj = -1;
@@ -399,7 +404,7 @@ void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
                		glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
            		}
                 if (season == 2) {
-                    GLfloat summer[] = {(GLfloat)(134)/255.0,(GLfloat)(189)/255.0, (GLfloat)(75)/255.0, .4};
+                    GLfloat summer[] = {(GLfloat)(redGlobal)/255.0,(GLfloat)(greenGlobal)/255.0, (GLfloat)(blueGlobal)/255.0, .4};
                     glMaterialfv(GL_FRONT, GL_DIFFUSE, summer);
                 }
 			     //Two fall colors
@@ -585,11 +590,11 @@ void drawForest( void )
     glClearColor(0.0,0.0,0.0,1.0);
     initLights();
     int i;
-    glTranslatef(4,0,7);
+    glTranslatef(6,0,7);
     for (i=0;i<NUM_TREES;i++) {
         glPushMatrix();
        // srand(time(NULL));
-        glTranslatef(randFloat(0.0,8.0),0,randFloat(0.0,7.0));
+        glTranslatef(randFloat(0.0,7.0),0,randFloat(0.0,7.0));
         srand(seeds[i]);
         drawTree();
         glPopMatrix();
@@ -604,19 +609,20 @@ GLfloat rainAngle = 0.0;
 void precipitation( void )
 {
     int i;
-    if (season == 1) {
+    /*if (season == 4) {
         GLfloat winterColor[] = {1, 1, 1, 1};
+        //fprintf(stderr,"ITS SNOWING");
         for (i=0;i<20000;i++) {  
-              GLfloat zPos = randFloat(-30,30);
-             GLfloat xPos = randFloat(-30,30);
-                GLfloat height = randFloat(0,40);
+            GLfloat zPos = randFloat(-30,30);
+            GLfloat xPos = randFloat(-30,30);
+           GLfloat height = randFloat(0,40);
            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
            glBegin(GL_POINTS);
-           glVertex3f(xPos,height-snowFall,zPos);
+           glVertex3f(xPos,height-rainFall,zPos);
            glEnd();
         }
-    }
-    else {
+    }*/
+    //else {
         GLfloat streak = randFloat(0,1);
         GLfloat rainColor[] = {1, 1, 1, .5};
         GLfloat xAngling = randFloat(-.3,.3)*(rainAngle);
@@ -626,13 +632,24 @@ void precipitation( void )
             GLfloat xPos = randFloat(-30,30);
             GLfloat height = randFloat(0,40);
             
-            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, rainColor);
-            glBegin(GL_LINES);
-            glVertex3f(xPos,height-rainFall,zPos);
-            glVertex3f(xPos-xAngling,height-rainFall-streak,zPos);
-            glEnd();
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, rainColor);
+            if (season != 4) {
+                 glBegin(GL_LINES);
+                 glVertex3f(xPos,height-rainFall,zPos);
+                 glVertex3f(xPos-xAngling,height-rainFall-streak,zPos);
+                glEnd();
+            }
+            
+            else { 
+                GLfloat winterColor[] = {1, 1, 1, 1};
+              //  glMaterialfv(GL_FRONT, GL_DIFFUSE, winterColor);
+                glPointSize(100);
+                glBegin(GL_POINTS);
+                glVertex3f(xPos,height-rainFall,zPos);
+                glEnd();
+            }
         }
-    }
+   // }
 }
 
 
@@ -677,6 +694,10 @@ void drawScene( void )
 	glPushMatrix();
 	{
 
+        setCurrentShader(defaultShader);
+        //glPushMatrix();            
+        precipitation();            
+       // glPopMatrix();
         initSky();
 
         setCurrentShader(defaultShader);
@@ -688,9 +709,7 @@ void drawScene( void )
         drawForest();
         glPopMatrix();
 
-        glPushMatrix();            
-        precipitation();            
-        glPopMatrix();
+       
 
 		setCurrentShader(windowShader);
 
@@ -921,15 +940,6 @@ void updatePrecip( void )
         rainFall = 0;
     else
         rainFall+=1.0;
-    if (snowFall > 20)
-        snowFall = 0;
-    else
-        snowFall+=0.3;
-
-    if (precipCounter < 50) {
-        return;
-    }
-
 
     if (rainAngle<20 && state == 1) {
         rainAngle+=1.0;
@@ -952,12 +962,31 @@ void updatePrecip( void )
 
 }
 
+void updateTree( void )
+{
+
+
+    if (redGlobal < 255)
+        redGlobal+=.25;
+
+    if (greenGlobal > 40)
+        greenGlobal-=2.0;
+
+    if (blueGlobal > 55)
+        blueGlobal-=.5;
+
+
+}
+
 
 void update(int value)
 {
 	counter++;
     
     updatePrecip();
+
+    if (counter > 100) 
+    updateTree();
     // fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
