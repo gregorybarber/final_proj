@@ -125,14 +125,9 @@ void setupRC()
 
 void setShadeParam( void ) //give parameters as toggle and light direction
 {
-	shaderProg->set_uniform_3f("lightDir", 2.0f, 1.0f, 3.0f);
+	shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
 	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
 	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-	shaderProg->set_uniform_1i("gouraudToggle", gouraudToggle);
-	shaderProg->set_uniform_1i("blinnPhongToggle", blinnPhongToggle);
-	shaderProg->set_uniform_1i("checkerboardToggle", checkerboardToggle);
-	shaderProg->set_uniform_1i("colorTextureToggle", colorTextureToggle);
-	shaderProg->set_uniform_1i("normalTextureToggle", normalTextureToggle);
 }
 
 
