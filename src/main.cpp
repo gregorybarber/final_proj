@@ -704,6 +704,11 @@ void drawScene( void )
 		glCallList(skybox_id);
 
         setCurrentShader(defaultShader);
+        //glPushMatrix();            
+        precipitation();            
+       // glPopMatrix();
+
+        setCurrentShader(defaultShader);
         drawFloor();
 
 		setCurrentShader(defaultShader);
