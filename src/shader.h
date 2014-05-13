@@ -82,7 +82,7 @@ varying float intensity; \n
 
 void main() {
 
-	vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st * 0.3);
+	vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st * 0.18);
 
 	if (colorSample.r > 0.5)
 		gl_FragColor = colorSample;
