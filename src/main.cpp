@@ -130,31 +130,12 @@ static void setCurrentShader(GLSLProgram* s) {
 	// glutPostRedisplay();
 }
 
-void setCamera( void )
-{
-	glTranslatef(0, 0, camPosZ);
-	glRotatef(camRotX, 1, 0, 0);
-	glRotatef(camRotY, 0, 1, 0);
-}
-
 void drawBox( GLfloat height, GLfloat width )
 {
       /* draws the sides of a unit cube (0,0,0)-(1,1,1) */
 
-    // glBegin(GL_POLYGON);/* f1: BOTTOM */
-    // { 
-    //   	glNormal3f(-1.0f,0.0f,0.0f);
-    //   	glTexCoord2f (0.0, 0.0);
-    //     glVertex3f(0.0f,0.0f,0.0f);
-    //     glTexCoord2f (1.0, 0.0);
-    //     glVertex3f(0.0f,0.0f,width);
-    //     glTexCoord2f (1.0, 1.0);
-    //     glVertex3f(width,0.0f,width);
-    //     glTexCoord2f (0.0, 1.0);
-    //     glVertex3f(width,0.0f,0.0f);
-    // }
-    // glEnd();
     glBegin(GL_POLYGON);/* f2: BACK */
+
     {
         glNormal3f(0.0f,0.0f,-1.0f);
         glTexCoord2f (0.0, 0.0);
@@ -220,6 +201,22 @@ void drawBox( GLfloat height, GLfloat width )
     }
     glEnd();
 }
+
+void initSky() {
+    GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, 1.0};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+    glutSolidCube(100);
+}
+
+void setCamera( void )
+{
+	glTranslatef(0, 0, camPosZ);
+	glRotatef(camRotX, 1, 0, 0);
+	glRotatef(camRotY, 0, 1, 0);
+    initSky();
+}
+
+
 
 class Position {
 public:
