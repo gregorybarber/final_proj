@@ -184,26 +184,26 @@ void drawBox( GLfloat height, GLfloat width )
     glBegin(GL_POLYGON);/* f5: LEFT */
     {
         glNormal3f(0.0f,1.0,0.0f);
-        glTexCoord2f (0.0, 0.0);
+		glTexCoord2f (0.0, -(height / width));
         glVertex3f(0.0f,0.0f,0.0f);
-        glTexCoord2f (1.0, 0.0);
+        glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,0.0f);
-        glTexCoord2f (1.0, height);
+        glTexCoord2f (0.0, height);
         glVertex3f(0.0f,height,width);
-        glTexCoord2f (0.0,height);
+        glTexCoord2f (0.0,0.0);
         glVertex3f(0.0f,0.0f,width);
     }
     glEnd();
     glBegin(GL_POLYGON);/* f6: RIGHT */
     {
 		glNormal3f(0.0f,-1.0,0.0f); 
-		glTexCoord2f (0.0, 0.0);
+		glTexCoord2f (0.0, -(height / width));
         glVertex3f(width,0.0f,0.0f);
-        glTexCoord2f (1.0, 0.0);
+        glTexCoord2f (1.0, -(height / width));
         glVertex3f(width,0.0f,width);
-        glTexCoord2f (1.0, height);
+        glTexCoord2f (1.0, 0.0);
         glVertex3f(width,height,width);
-        glTexCoord2f (0.0, height);
+        glTexCoord2f (0.0, 0.0);
         glVertex3f(width,height,0.0f);
     }
     glEnd();
@@ -290,8 +290,8 @@ void Node::drawSelf() {
   //  }
   //  else {
     glColor4fv(color1);
-        // glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, color1);
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
+    // glMaterialfv(GL_FRONT, GL_DIFFUSE, color1);
  //   }
     if (counter > start) {
     	currHeight = (counter-start)*rate;
