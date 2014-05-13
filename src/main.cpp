@@ -70,10 +70,11 @@ GLfloat light1_spe[] = {1.0, 1.0, 1.0, 1.0};
 
 static GLScreenCapturer screenshot("screenshot-%d.ppm");
 static GLSLProgram*     shaderProg = NULL;
+static GLSLProgram* windowShader = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
-const char* window_file = "textures/windows.png";
+const char* window_file = "textures/windows2.png";
 
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
@@ -124,6 +125,11 @@ void setupRC()
 	initLights();
 }
 
+static void setCurrentShader(GLSLProgram* s) {
+	shaderProg = s;
+	// glutPostRedisplay();
+}
+
 void setCamera( void )
 {
 	glTranslatef(0, 0, camPosZ);
@@ -135,20 +141,20 @@ void drawBox( GLfloat height, GLfloat width )
 {
       /* draws the sides of a unit cube (0,0,0)-(1,1,1) */
 
-    glBegin(GL_POLYGON);/* f1: front */
-    { 
-      	glNormal3f(-1.0f,0.0f,0.0f);
-      	glTexCoord2f (0.0, 0.0);
-        glVertex3f(0.0f,0.0f,0.0f);
-        glTexCoord2f (1.0, 0.0);
-        glVertex3f(0.0f,0.0f,width);
-        glTexCoord2f (1.0, 1.0);
-        glVertex3f(width,0.0f,width);
-        glTexCoord2f (0.0, 1.0);
-        glVertex3f(width,0.0f,0.0f);
-    }
-    glEnd();
-    glBegin(GL_POLYGON);/* f2: bottom */
+    // glBegin(GL_POLYGON);/* f1: BOTTOM */
+    // { 
+    //   	glNormal3f(-1.0f,0.0f,0.0f);
+    //   	glTexCoord2f (0.0, 0.0);
+    //     glVertex3f(0.0f,0.0f,0.0f);
+    //     glTexCoord2f (1.0, 0.0);
+    //     glVertex3f(0.0f,0.0f,width);
+    //     glTexCoord2f (1.0, 1.0);
+    //     glVertex3f(width,0.0f,width);
+    //     glTexCoord2f (0.0, 1.0);
+    //     glVertex3f(width,0.0f,0.0f);
+    // }
+    // glEnd();
+    glBegin(GL_POLYGON);/* f2: BACK */
     {
         glNormal3f(0.0f,0.0f,-1.0f);
         glTexCoord2f (0.0, 0.0);
@@ -161,7 +167,46 @@ void drawBox( GLfloat height, GLfloat width )
         glVertex3f(0.0f,height,0.0f);
     }
     glEnd();
-    glBegin(GL_POLYGON);/* f3:back */
+    glBegin(GL_POLYGON);/* f4: FRONT */
+    {
+        glNormal3f(0.0f,0.0f,1.0f);
+	    glTexCoord2f (1.0, 1.0);
+        glVertex3f(width,height,width);
+        glTexCoord2f (1.0, 1 - (height / width));
+        glVertex3f(width,0.0f,width);
+        glTexCoord2f (0.0, 1 - (height / width));
+        glVertex3f(0.0f,0.0f,width);
+        glTexCoord2f (0.0, 1.0);
+        glVertex3f(0.0f,height,width);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f5: LEFT */
+    {
+        glNormal3f(0.0f,1.0,0.0f);
+		glTexCoord2f (0.0, -(height / width));
+        glVertex3f(0.0f,0.0f,0.0f);
+        glTexCoord2f (0.0, 1.0);
+        glVertex3f(0.0f,height,0.0f);
+        glTexCoord2f (0.0, height);
+        glVertex3f(0.0f,height,width);
+        glTexCoord2f (0.0,0.0);
+        glVertex3f(0.0f,0.0f,width);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f6: RIGHT */
+    {
+		glNormal3f(0.0f,-1.0,0.0f); 
+		glTexCoord2f (0.0, -(height / width));
+        glVertex3f(width,0.0f,0.0f);
+        glTexCoord2f (1.0, -(height / width));
+        glVertex3f(width,0.0f,width);
+        glTexCoord2f (1.0, 0.0);
+        glVertex3f(width,height,width);
+        glTexCoord2f (0.0, 0.0);
+        glVertex3f(width,height,0.0f);
+    }
+    glEnd();
+    glBegin(GL_POLYGON);/* f3:TOP */
     { 
         glNormal3f(1.0f,0.0f,0.0f);
         glTexCoord2f (0.0, 0.0);
@@ -172,45 +217,6 @@ void drawBox( GLfloat height, GLfloat width )
         glVertex3f(0.0f,height,width);
          glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,0.0f);
-    }
-    glEnd();
-    glBegin(GL_POLYGON);/* f4: top */
-    {
-        glNormal3f(0.0f,0.0f,1.0f);
-         glTexCoord2f (0.0, 0.0);
-        glVertex3f(width,height,width);
-         glTexCoord2f (1.0, 0.0);
-        glVertex3f(width,0.0f,width);
-         glTexCoord2f (1.0, 1.0);
-        glVertex3f(0.0f,0.0f,width);
-         glTexCoord2f (0.0, 1.0);
-        glVertex3f(0.0f,height,width);
-    }
-    glEnd();
-    glBegin(GL_POLYGON);/* f5: left */
-    {
-        glNormal3f(0.0f,1.0,0.0f);
-        glTexCoord2f (0.0, 0.0);
-        glVertex3f(0.0f,0.0f,0.0f);
-        glTexCoord2f (1.0, 0.0);
-        glVertex3f(0.0f,height,0.0f);
-        glTexCoord2f (1.0, height);
-        glVertex3f(0.0f,height,width);
-        glTexCoord2f (0.0,height);
-        glVertex3f(0.0f,0.0f,width);
-    }
-    glEnd();
-    glBegin(GL_POLYGON);/* f6: right */
-    {
-		glNormal3f(0.0f,-1.0,0.0f); 
-		glTexCoord2f (0.0, 0.0);
-        glVertex3f(width,0.0f,0.0f);
-        glTexCoord2f (1.0, 0.0);
-        glVertex3f(width,0.0f,width);
-        glTexCoord2f (1.0, height);
-        glVertex3f(width,height,width);
-        glTexCoord2f (0.0, height);
-        glVertex3f(width,height,0.0f);
     }
     glEnd();
 }
@@ -282,8 +288,9 @@ void Node::drawSelf() {
   //      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, selectedColor);
   //  }
   //  else {
-        glColor4fv(color1);
+    glColor4fv(color1);
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
+    // glMaterialfv(GL_FRONT, GL_DIFFUSE, color1);
  //   }
     if (counter > start) {
     	currHeight = (counter-start)*rate;
@@ -313,7 +320,6 @@ void drawFloor( void )
 
 void setShadeParam( void ) //give parameters as toggle and light direction
 {
-	shaderProg->enable();
 	shaderProg->set_uniform_3f("lightDir", 2.0f, 1.0f, 3.0f);
 	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
 	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
@@ -548,6 +554,7 @@ void drawTreeGround( void )
             glEnd();
         }
     }*/
+
     //generate trunk of tree
     GLfloat color[] = {(GLfloat)(171.0)/255.0,(GLfloat)(158)/255.0, (GLfloat)(114)/255.0, 1};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
@@ -657,6 +664,10 @@ void drawScene( void )
 	glInitNames();
 	glPushName(0);
 
+	setCurrentShader(windowShader);
+	shaderProg->enable();
+    setShadeParam();
+
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
@@ -668,7 +679,7 @@ void drawScene( void )
         precipitation();              //new
         glPopMatrix();              //new
 
-        setShadeParam();
+
 
 		drawFloor();
 
@@ -740,11 +751,6 @@ void reshape( int w, int h )
 
 }
 
-static void setCurrentShader(GLSLProgram* s) {
-	shaderProg = s;
-	glutPostRedisplay();
-}
-
 static void setupShaders()
 {
 	printf("MSG: Initialize GLSL Shaders ...\n");
@@ -756,7 +762,7 @@ static void setupShaders()
 		exit(2);
 	}
 
-	shaderProg = new GLSLProgram(generalVS, generalFS);
+	windowShader = new GLSLProgram(windowVS, windowFS);
 
 	gouraudToggle = 1;
 	blinnPhongToggle = 0;
@@ -770,14 +776,14 @@ static void setupShaders()
 		                               SOIL_CREATE_NEW_ID,
 		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
 	if (normal_texture_id == 0)
-		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << normal_file << ")" << endl;
+		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << window_file << ")" << endl;
 
 	glActiveTexture(GL_TEXTURE1);
-	color_texture_id = SOIL_load_OGL_texture(color_file, 
+	color_texture_id = SOIL_load_OGL_texture(window_file, 
 		                               SOIL_LOAD_AUTO,
 		                               SOIL_CREATE_NEW_ID,
 		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
-	if (normal_texture_id == 0)
+	if (color_texture_id == 0)
 		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << color_file << ")" << endl;
 }
 
@@ -986,6 +992,7 @@ void update(int value)
 	counter++;
     
     updatePrecip();
+    // fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
 	if (camRotX > 730) {
