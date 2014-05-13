@@ -3,6 +3,45 @@
 
 #define STRINGIFY(A) #A
 
+const char* defaultVS = STRINGIFY(
+
+	varying vec3 normal;\n
+	varying vec3 vertex;\n
+
+	uniform vec3 lightDir; \n
+
+	varying float intensity; \n
+
+	void main() {
+		gl_Position = ftransform();
+		vertex = vec3(gl_ModelViewMatrix * gl_Vertex); \n
+		normal = normalize(gl_NormalMatrix * gl_Normal);\n
+		gl_TexCoord[0] = gl_MultiTexCoord0;\n
+
+		intensity = max(0.0, dot(normalize(lightDir), normalize(normal)));
+	}
+
+);
+
+const char* defaultFS = STRINGIFY(
+
+	varying vec3 normal;\n
+	varying vec3 vertex;\n
+
+	uniform vec3 lightDir; \n
+
+	varying float intensity; \n
+
+	void main() {
+
+		vec3 amb = gl_FrontMaterial.ambient.rgb;
+		vec3 dif = gl_FrontMaterial.diffuse.rgb * intensity;
+		float alpha = gl_FrontMaterial.diffuse.a;
+		gl_FragColor = vec4(amb + dif, alpha);
+	}
+
+);
+
 const char* windowVS = STRINGIFY(
 
 uniform sampler2D normalMap;\n

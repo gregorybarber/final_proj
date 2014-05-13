@@ -55,8 +55,8 @@ int seeds[NUM_TREES];
 // Lights & Materials
 GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
 GLfloat position[] = {4, 4, 4, 1.0};
-GLfloat mat_diffuse[] = {0.6, 0.6, 0.6, 1.0};
-GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
+GLfloat mat_diffuse[] = {0.4, 0.4, 0.4, 1.0};
+GLfloat mat_specular[] = {0.4, 0.4, 0.4, 1.0};
 GLfloat mat_shininess[] = {50.0};
 
 GLfloat light1_amb[] = {0.0, 0.0, 0.0, 1.0};
@@ -67,6 +67,7 @@ GLfloat light1_spe[] = {1.0, 1.0, 1.0, 1.0};
 static GLScreenCapturer screenshot("screenshot-%d.ppm");
 static GLSLProgram*     shaderProg = NULL;
 static GLSLProgram* windowShader = NULL;
+static GLSLProgram* defaultShader = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
@@ -97,6 +98,7 @@ void initLights(void)
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_dif);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_spe);
 
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -121,8 +123,23 @@ void setupRC()
 	initLights();
 }
 
+void setShadeParam( void ) //give parameters as toggle and light direction
+{
+	shaderProg->set_uniform_3f("lightDir", 2.0f, 1.0f, 3.0f);
+	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->set_uniform_1i("gouraudToggle", gouraudToggle);
+	shaderProg->set_uniform_1i("blinnPhongToggle", blinnPhongToggle);
+	shaderProg->set_uniform_1i("checkerboardToggle", checkerboardToggle);
+	shaderProg->set_uniform_1i("colorTextureToggle", colorTextureToggle);
+	shaderProg->set_uniform_1i("normalTextureToggle", normalTextureToggle);
+}
+
+
 static void setCurrentShader(GLSLProgram* s) {
 	shaderProg = s;
+	s->enable();
+	setShadeParam();
 	// glutPostRedisplay();
 }
 
@@ -299,6 +316,9 @@ void Node::drawSelf() {
 
 void drawFloor( void )
 {
+	GLfloat color[] = {0.1, 0.1, 0.1, 1};
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
+
 	glBegin(GL_QUADS);
     	glVertex3f(10000,0,-10000);
     	glVertex3f(-10000,0,-10000);
@@ -306,19 +326,6 @@ void drawFloor( void )
     	glVertex3f(10000,0,10000);
     glEnd();
 }
-
-void setShadeParam( void ) //give parameters as toggle and light direction
-{
-	shaderProg->set_uniform_3f("lightDir", 2.0f, 1.0f, 3.0f);
-	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-	shaderProg->set_uniform_1i("gouraudToggle", gouraudToggle);
-	shaderProg->set_uniform_1i("blinnPhongToggle", blinnPhongToggle);
-	shaderProg->set_uniform_1i("checkerboardToggle", checkerboardToggle);
-	shaderProg->set_uniform_1i("colorTextureToggle", colorTextureToggle);
-	shaderProg->set_uniform_1i("normalTextureToggle", normalTextureToggle);
-}
-
 
 
 void createObjects( void ) 
@@ -579,6 +586,7 @@ void drawForest( void )
     glShadeModel(GL_SMOOTH);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+    glBlendEquation(GL_FUNC_ADD);
     glClearColor(0.0,0.0,0.0,1.0);
     initLights();
     int i;
@@ -607,7 +615,7 @@ void precipitation( void )
               GLfloat zPos = randFloat(-30,30);
              GLfloat xPos = randFloat(-30,30);
                 GLfloat height = randFloat(0,40);
-           glMaterialfv(GL_FRONT, GL_DIFFUSE, winterColor);
+           glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
            glBegin(GL_POINTS);
            glVertex3f(xPos,height-snowFall,zPos);
            glEnd();
@@ -623,7 +631,7 @@ void precipitation( void )
             GLfloat xPos = randFloat(-30,30);
             GLfloat height = randFloat(0,40);
             
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, rainColor);
+            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, rainColor);
             glBegin(GL_LINES);
             glVertex3f(xPos,height-rainFall,zPos);
             glVertex3f(xPos-xAngling,height-rainFall-streak,zPos);
@@ -635,7 +643,7 @@ void precipitation( void )
 
 void initSky() {
     GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, 1.0};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, green);
     GLUquadricObj *sphere=NULL;
      sphere = gluNewQuadric();
      gluQuadricDrawStyle(sphere, GLU_FILL);
@@ -673,22 +681,23 @@ void drawScene( void )
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
+
         initSky();
+
+        setCurrentShader(defaultShader);
+        drawFloor();
+
+		setCurrentShader(defaultShader);
+
 		glPushMatrix();
         drawForest();
         glPopMatrix();
 
         glPushMatrix();            
         precipitation();            
-        glPopMatrix();              
-
-		drawFloor();
-
-		glLoadName(0);
+        glPopMatrix();
 
 		setCurrentShader(windowShader);
-		shaderProg->enable();
-	    setShadeParam();
 
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		drawObjects();
@@ -700,13 +709,11 @@ void drawScene( void )
 		drawObjects();
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glTranslatef(20.0,0.0,10.0);
-		drawObjects();
-
-		glLoadName(1);
+		drawObjects();          
 
 	}
 	glPopMatrix();
-	shaderProg->disable();
+
 
 	glColor4fv(currentColor);
 
@@ -764,6 +771,7 @@ static void setupShaders()
 	}
 
 	windowShader = new GLSLProgram(windowVS, windowFS);
+	defaultShader = new GLSLProgram(defaultVS, defaultFS);
 
 	gouraudToggle = 1;
 	blinnPhongToggle = 0;
