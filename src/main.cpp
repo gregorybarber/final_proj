@@ -202,18 +202,14 @@ void drawBox( GLfloat height, GLfloat width )
     glEnd();
 }
 
-void initSky() {
-    GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, 1.0};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
-    glutSolidCube(100);
-}
+
 
 void setCamera( void )
 {
 	glTranslatef(0, 0, camPosZ);
 	glRotatef(camRotX, 1, 0, 0);
 	glRotatef(camRotY, 0, 1, 0);
-    initSky();
+
 }
 
 
@@ -640,6 +636,23 @@ void precipitation( void )
     }
 }
 
+
+void initSky() {
+    GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, 1.0};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+    GLUquadricObj *sphere=NULL;
+     sphere = gluNewQuadric();
+     gluQuadricDrawStyle(sphere, GLU_FILL);
+     gluQuadricTexture(sphere, GLU_TRUE);
+     gluQuadricNormals(sphere, GLU_SMOOTH);
+      //Making a display list
+     // mysphereID = glGenLists(1);
+     // glNewList(mysphereID, GL_COMPILE);
+      gluSphere(sphere, 50, 20, 20);
+     //glEndList();
+     gluDeleteQuadric(sphere);
+}
+
 void drawScene( void )
 {
 	GLfloat density = 0.3;
@@ -668,13 +681,14 @@ void drawScene( void )
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
+        initSky();
 		glPushMatrix();
         drawForest();
         glPopMatrix();
 
-        glPushMatrix();             //new
-        precipitation();              //new
-        glPopMatrix();              //new
+        glPushMatrix();            
+        precipitation();            
+        glPopMatrix();              
 
 
 
