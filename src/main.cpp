@@ -32,6 +32,7 @@ using namespace std;
 
 #define BUFFER_LENGTH 64
 #define NUM_OBJ 5
+#define NUM_TREES 40
 
 GLfloat camRotX, camRotY, camPosX, camPosY, camPosZ;
 GLint viewport[4];
@@ -41,8 +42,17 @@ GLdouble projection[16];
 GLint counter = 0;
 class Node;
 
+int season = 2;
+int angle = 0;
+GLfloat falling = 0.0;
+GLfloat snowFall = 0.0;
+
 GLuint pickedObj = -1;
 char titleString[150];
+
+
+int seeds[NUM_TREES];
+
 
 bool isTeapot1_selected = false;
 bool isTeapot2_selected = false;
@@ -316,11 +326,6 @@ void setShadeParam( void ) //give parameters as toggle and light direction
 }
 
 
-float randFloat(const float& min, const float& max) {
-    float range = max - min;
-    float num = range * rand() / RAND_MAX;
-    return (num + min);
-}
 
 void createObjects( void ) 
 {
@@ -339,11 +344,264 @@ void createObjects( void )
 	}
 }
 
+float randFloat(const float& min, const float& max) {
+    float range = max - min;
+    float num = range * rand() / RAND_MAX;
+    return (num + min);
+}
 
+typedef struct branch branch;
+
+struct branch {
+    GLdouble bottomWidth, topWidth;
+    GLdouble length;
+} ;
+
+
+void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
+{    
+    int j;
+    branch* limb = new branch();
+    GLfloat lengthMult = (GLfloat)(rand()%+3)/10.0;
+    limb->bottomWidth = trunk->topWidth;
+    limb->topWidth = (limb->bottomWidth)*(lengthMult);
+    limb->length = ((trunk->length)*(lengthMult))-((GLdouble)(count+1)/10);
+    if (limb->length > .07)
+	limb->length = .07;
+    while (count < 3) {
+        glPushMatrix();
+        {
+	    //Draw Twigs (line segments, rather than tapered cylinders)
+	    glTranslatef(0,0,trunk->length*((GLfloat)(count+1)/5.0));
+        count++;
+	    GLfloat angleY = (GLfloat)(rand()%90-45);
+        GLfloat angleZ = (GLfloat)(rand()%360);
+        glRotated(angleY,1,1,0);
+        glRotated(angleZ,0,1,1);
+	    glLineWidth(.07);
+        glBegin(GL_LINES);
+	    glVertex3f(0,0,0);
+	    glVertex3f(0,0,limb->length);
+ 	    glEnd();
+        GLfloat radius = (GLfloat)((rand()%2+2)/10);
+        for (j = 0; j<8; j++) {
+        //Draw Seasonal Foliage
+            angleY = (GLfloat)(rand()%90-45);
+            angleZ = (GLfloat)(rand()%360);
+            if (season != 4) {
+                glPushMatrix();
+                {
+                if (season == 1){
+              		GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, .4};
+               		glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+           		}
+                if (season == 2) {
+                    GLfloat summer[] = {(GLfloat)(134)/255.0,(GLfloat)(189)/255.0, (GLfloat)(75)/255.0, .4};
+                    glMaterialfv(GL_FRONT, GL_DIFFUSE, summer);
+                }
+			     //Two fall colors
+		        if (season == 3) {
+			        if (j < 2) {
+			            GLfloat fallTwo[] = {(GLfloat)(232)/255.0,(GLfloat)(32)/255.0, (GLfloat)(59)/255.0, .4};
+                    	glMaterialfv(GL_FRONT, GL_DIFFUSE, fallTwo);
+		            }
+			   		else {
+				    	GLfloat fallThree[] = {(GLfloat)(250)/255.0,(GLfloat)(74)/255.0, (GLfloat)(15)/255.0, .4};
+                    	glMaterialfv(GL_FRONT, GL_DIFFUSE, fallThree);
+		        	}    		
+			   }	     
+                 glRotated(angleY,1,1,0);
+                 glRotated(angleZ,0,1,0);
+			//Draw foliage - partial spheres
+		       // gluSphere(quadObj, .5, 5, 2);
+			//if spring, draw flowers at the edges of the foliage
+                if (season == 1) {
+		            GLfloat flowerColor[] = {(GLfloat)(200)/255.0,(GLfloat)(152)/255.0, (GLfloat)(248)/255.0, .75};
+                    glMaterialfv(GL_FRONT, GL_DIFFUSE, flowerColor);
+			    	glRotated(angleY,1,1,0);
+			    	glRotated(angleZ,0,0,1);
+                    glTranslatef(0,0,radius);
+                    glutSolidSphere(.02,3,5);
+		        }
+		    }
+                    glPopMatrix();
+                   }
+           	}	
+                GLfloat colorReset[] = {(GLfloat)(171.0)/255.0,(GLfloat)(158)/255.0, (GLfloat)(114)/255.0, 1};
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, colorReset);
+	        drawTwigs(count,limb, quadObj);
+   	}
+	glPopMatrix();
+    }
+}
+
+        
+void drawBranches( int numBranches, branch* trunk, GLUquadricObj *quadObj)
+{
+    branch* limb = new branch();
+    int level = 7;
+    int count = 0;
+    limb->length = trunk->length;
+    numBranches--;
+    GLfloat color[] = {(GLfloat)(171.0)/255.0,(GLfloat)(158)/255.0, (GLfloat)(114)/255.0, 1};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+    GLfloat angleY;
+    while (count < 4 && limb->length>.5) {
+	//Generate randomized branches using tapered cylinders   	
+        GLfloat lengthMult = (GLfloat)(rand()%4+4)/10.0;
+        limb->bottomWidth = trunk->topWidth;
+        limb->topWidth = (limb->bottomWidth)*(lengthMult);
+        limb->length = ((trunk->length)*(lengthMult));
+		glPushMatrix();
+    	{  
+	    //constrain child branches to the tops of their parent
+	
+	    if (level > 3)
+            level--;
+        else
+		 	level=7;
+		count++;
+		glTranslatef(0,0,(trunk->length)*((GLdouble)(level)/7)); 
+        if (level > 3)
+			angleY = (GLfloat)(rand()%90-45);
+        else
+			angleY = (GLfloat)(rand()%70);
+        GLfloat angleZ = (GLfloat)(rand()%180-180);
+        glLoadName(1);
+        glRotated(angleZ,0,0,1);
+        glRotated(angleY,0,1,0);
+        gluSphere(quadObj, (limb->bottomWidth)*1.1, 25, 50);
+        gluCylinder(quadObj, limb->bottomWidth, limb->topWidth, limb->length, 10, 100);
+        drawBranches(numBranches,limb, quadObj);
+    	}    
+    	glPopMatrix();
+    }
+    //Once chain of branches is complete, draw "twigs" on the last branch
+    drawTwigs(numBranches,limb, quadObj);
+
+}
+
+void drawTreeGround( void )
+{
+    int i;
+    GLfloat randZ, randX;
+    branch* trunk = new branch();
+    glPushMatrix();
+    GLUquadricObj *quadObj;
+    glLoadName(0);
+    int numBranches = 5;
+    quadObj = gluNewQuadric ();
+    gluQuadricDrawStyle (quadObj, GLU_FILL);
+    gluQuadricNormals (quadObj, GLU_FLAT);
+    glRotatef(-90,1,0,0);
+    GLfloat ground[] = {(GLfloat)(65.0)/255.0,(GLfloat)(186.0)/255.0, (GLfloat)(83.0)/255.0, 1};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, ground);
+    if (season == 4) {
+	GLfloat winterGround[] = {(GLfloat)(255.0)/255.0,(GLfloat)(255.0)/255.0, (GLfloat)(255.0)/255.0, 1};
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, winterGround);
+    }
+    //randomize all branch angles and lengths using this starting seed
+    //srand(seed);
+    //draw ground
+    glBegin(GL_QUADS);
+    glVertex3f(-1000,1000,-1);
+    glVertex3f(-1000,-1000,-1);
+    glVertex3f(1000,-1000,-1);
+    glVertex3f(1000,1000,-1);
+    glEnd();
+    //in fall, generate falling leaves
+    for (i=0; i<100; i++) { 
+		randZ = randFloat(-6,6);
+        randX = randFloat(-6,6);
+		GLfloat height = randFloat(10.0,18.0);
+        if (height+falling < 0.0) {
+	    	height = 0.0;
+		}
+    	if (season == 3) {                                   
+	   		GLfloat fallOne[] = {(GLfloat)(212)/255.0,(GLfloat)(61)/255.0, (GLfloat)(76)/255.0, .9};
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, fallOne);
+            glBegin(GL_POINTS);
+            glVertex3f(randX,randZ,falling+height);
+            glEnd();
+        }
+    }
+    //in winter, generate falling snow
+    for (i=0; i<1000; i++) {
+		randZ = randFloat(-50,50);
+        randX = randFloat(-50,50);
+        GLfloat start = randFloat(10.0,50.0);
+		GLfloat rate = randFloat(.6,1.0);
+        if (start+falling < 0.0) 
+	    	start = 0.0;
+        if (season == 4) {
+            GLfloat winter[] = {(GLfloat)(300)/255.0,(GLfloat)(300)/255.0, (GLfloat)(300)/255.0, .4};
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, winter);
+            glBegin(GL_POINTS);
+            glVertex3f(randX,randZ,rate*snowFall+start);
+            glEnd();
+        }
+    }
+    //generate trunk of tree
+    GLfloat color[] = {(GLfloat)(171.0)/255.0,(GLfloat)(158)/255.0, (GLfloat)(114)/255.0, 1};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+    gluCylinder(quadObj, 0.04, 0.02, 1.30, 10, 100);
+    trunk->bottomWidth = .03;
+    trunk->topWidth = .02;
+    trunk->length = 1.3;
+    //generate branches off of starting trunk
+    drawBranches(numBranches, trunk,quadObj);
+    glPopMatrix();
+}
+
+void drawTree( void )
+{
+    
+    float currentColor[4];
+    glGetFloatv(GL_CURRENT_COLOR, currentColor);
+
+    // Initialize the name stack
+    glInitNames();
+    glPushName(0);
+    drawTreeGround();
+    glColor4fv(currentColor);
+}
+
+void drawForest( void )
+{
+    int i;
+    glTranslatef(4,0,7);
+    for (i=0;i<NUM_TREES;i++) {
+        glPushMatrix();
+       // srand(time(NULL));
+        glTranslatef(randFloat(0.0,8.0),0,randFloat(0.0,7.0));
+        srand(seeds[i]);
+        drawTree();
+        glPopMatrix();
+
+    }
+    /*glTranslatef(6,0,7);
+    srand(seeds[0]);
+    drawTree();
+    glTranslatef(1,0,0);
+    srand(seeds[1]);
+    drawTree();
+    glTranslatef(1,0,1);
+    srand(seeds[2]);
+    drawTree();*/
+}
 
 void drawScene( void )
 {
+	GLfloat density = 0.3;
+	GLfloat fogColor[4] = {0.5, 0.5, 0.5, 1.0};
+	glEnable (GL_FOG);
+	glFogi (GL_FOG_MODE, GL_EXP2);
+	glFogfv (GL_FOG_COLOR, fogColor);
+	glFogf (GL_FOG_DENSITY, density);
+	glFogf(GL_FOG_START, 0.0f);
+    glFogf(GL_FOG_END, 20.0f);
 	float currentColor[4];
+
 	glGetFloatv(GL_CURRENT_COLOR, currentColor);
 
 	GLfloat selectedColor[] = {0, 1, 0, 1};
@@ -355,9 +613,17 @@ void drawScene( void )
 
 	setShadeParam();
 
+
+
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
+		glPushMatrix();
+        drawForest();
+        glPopMatrix();
+
+
+
 		drawFloor();
 		if( isTeapot1_selected )
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
@@ -671,13 +937,20 @@ void update(int value)
 	glutTimerFunc(25, update, 0);
 }
 
+void randSeeds( void )
+{
+    int i;
+    for (i=0; i<NUM_TREES; i++) {
+        seeds[i] = (int)rand();
+    }
+}
 
 
 int main (int argc, char *argv[])
 {
 	int win_width = 960;
 	int win_height = 540;
-
+    randSeeds();
 	glutInit( &argc, argv );
 	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize( win_width, win_height );
