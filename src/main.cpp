@@ -32,7 +32,7 @@ using namespace std;
 
 #define BUFFER_LENGTH 64
 #define NUM_OBJ 5
-#define NUM_TREES 20
+#define NUM_TREES 28
 
 GLfloat camRotX, camRotY, camPosX, camPosY, camPosZ;
 GLint viewport[4];
@@ -339,14 +339,31 @@ void createObjects( void )
 	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
 	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.09f);
 	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
-	
 
+    Node *nodeTen = new Node(0.0f,0.0f,0.0f,2.0f,3.0f,50,0.04f);
+    Node *nodeElev = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,100,0.02f);
+    Node *nodeTwel = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,125,0.03f);
+    Node *nodeThir = new Node(0.0f,0.0f,-2.5f,3.0f,2.0f,150,0.04f);
+    Node *nodeFourt = new Node(-5.0f,0.0f,0.0f,2.0f,1.5f,110,0.06f);
+    Node *nodeFift = new Node(2.5f,0.0f,-2.5f,3.0f,2.0f,200,0.05f);
+    Node *nodeSixt = new Node(-7.5f,0.0f,2.5f,4.0f,2.0f,150,0.04f);
+    Node *nodeSevent = new Node(-5.0f,0.0f,2.5f,5.0f,3.0f,120,0.05f);
+    Node *nodeEighte = new Node(-5.0f,0.0f,-5.0f,3.0f,3.0f,70,0.06f);	
 }
 
-void drawObjects( void ) 
+void drawTallObjects( void ) 
 {
     int i;
-    for(size_t i=0; i < nodeMap.size(); i++) {
+    for(size_t i=0; i < 9; i++) {
+        nodeMap[i]->drawSelf();
+
+    }
+}
+
+void drawShortObjects( void ) 
+{
+    int i;
+    for(size_t i=9; i < nodeMap.size(); i++) {
         nodeMap[i]->drawSelf();
 
     }
@@ -420,9 +437,9 @@ void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
 			   }	     
                  glRotated(angleY,1,1,0);
                  glRotated(angleZ,0,1,0);
-			//Draw foliage - partial spheres
+			     //Draw foliage - partial spheres
 		        gluSphere(quadObj, .5, 5, 2);
-			//if spring, draw flowers at the edges of the foliage
+			     //if spring, draw flowers at the edges of the foliage
                 if (season == 1) {
 		            GLfloat flowerColor[] = {(GLfloat)(200)/255.0,(GLfloat)(152)/255.0, (GLfloat)(248)/255.0, .75};
                     glMaterialfv(GL_FRONT, GL_DIFFUSE, flowerColor);
@@ -609,20 +626,7 @@ GLfloat rainAngle = 0.0;
 void precipitation( void )
 {
     int i;
-    /*if (season == 4) {
-        GLfloat winterColor[] = {1, 1, 1, 1};
-        //fprintf(stderr,"ITS SNOWING");
-        for (i=0;i<20000;i++) {  
-            GLfloat zPos = randFloat(-30,30);
-            GLfloat xPos = randFloat(-30,30);
-           GLfloat height = randFloat(0,40);
-           glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
-           glBegin(GL_POINTS);
-           glVertex3f(xPos,height-rainFall,zPos);
-           glEnd();
-        }
-    }*/
-    //else {
+
         GLfloat streak = randFloat(0,1);
         GLfloat rainColor[] = {1, 1, 1, .5};
         GLfloat xAngling = randFloat(-.3,.3)*(rainAngle);
@@ -714,16 +718,54 @@ void drawScene( void )
 		setCurrentShader(windowShader);
 
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
-		drawObjects();
+		drawTallObjects();
+        glPushMatrix();
 		glTranslatef(0.0,0.0,10.0);
-		drawObjects();
-		glTranslatef(10.0,0.0,-10.0);
-		drawObjects();
-		glTranslatef(10.0,0.0,10.0);
-		drawObjects();
+		drawTallObjects();
+        glPopMatrix();
+        glPushMatrix();
+		glTranslatef(0.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(10.0,0.0,0.0);
+		drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(-10.0,0.0,0.0);
+        drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(10.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(-10.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(20.0,0.0,0.0);
+        drawTallObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(10.0,0.0,20.0);
+        drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(0.0,0.0,20.0);
+        drawShortObjects();
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(20.0,0.0,10.0);
+        drawShortObjects();
+        glPopMatrix();
+
+
+		//glTranslatef(10.0,0.0,10.0);
+		//drawTallObjects();
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
-		glTranslatef(20.0,0.0,10.0);
-		drawObjects();          
+		//glTranslatef(10.0,0.0,-10.0);
+		//drawShortObjects();          
 
 	}
 	glPopMatrix();
@@ -990,7 +1032,7 @@ void update(int value)
     // fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
-	if (camRotX > 725) {
+	if (camRotX > 730) {
 		camRotX-= .09;
 	//	camRotY+= .3;
 	}
@@ -999,7 +1041,7 @@ void update(int value)
 		//camPosZ += .2;
 	}
 	if (camPosZ < -19) {
-		camPosZ +=.07;
+	//	camPosZ +=.07;
 	}
 	display();
 	glutTimerFunc(20, update, 0);
