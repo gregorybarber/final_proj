@@ -44,8 +44,7 @@ class Node;
 
 int season = 2;
 int angle = 0;
-GLfloat falling = 0.0;
-GLfloat snowFall = 0.0;
+
 
 GLuint pickedObj = -1;
 char titleString[150];
@@ -599,14 +598,42 @@ void drawForest( void )
     }
 }
 
+GLfloat snowFall = 0.0;
 GLfloat rainFall = 0.0;
+GLfloat rainAngle = 0.0;
 
-void rainEffects( void )
+void precipitation( void )
 {
+    int i;
+    if (season == 1) {
+        GLfloat winterColor[] = {1, 1, 1, 1};
+        for (i=0;i<20000;i++) {  
+              GLfloat zPos = randFloat(-30,30);
+             GLfloat xPos = randFloat(-30,30);
+                GLfloat height = randFloat(0,40);
+           glMaterialfv(GL_FRONT, GL_DIFFUSE, winterColor);
+           glBegin(GL_POINTS);
+           glVertex3f(xPos,height-snowFall,zPos);
+           glEnd();
+        }
+    }
+    else {
+        GLfloat streak = randFloat(0,1);
+        GLfloat rainColor[] = {1, 1, 1, .5};
+        GLfloat xAngling = randFloat(-.3,.3)*(rainAngle);
 
-
-
-
+        for (i=0;i<10000;i++) {
+            GLfloat zPos = randFloat(-30,30);
+            GLfloat xPos = randFloat(-30,30);
+            GLfloat height = randFloat(0,40);
+            
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, rainColor);
+            glBegin(GL_LINES);
+            glVertex3f(xPos,height-rainFall,zPos);
+            glVertex3f(xPos-xAngling,height-rainFall-streak,zPos);
+            glEnd();
+        }
+    }
 }
 
 void drawScene( void )
@@ -638,7 +665,7 @@ void drawScene( void )
         glPopMatrix();
 
         glPushMatrix();             //new
-        rainEffects();              //new
+        precipitation();              //new
         glPopMatrix();              //new
 
         setShadeParam();
@@ -911,11 +938,54 @@ void motion(int x, int y)
 
 }
 
+int state = 0;
+int precipCounter = 0;
+
+void updatePrecip( void )
+{
+    precipCounter++;
+
+    if (rainFall > 20)
+        rainFall = 0;
+    else
+        rainFall+=1.0;
+    if (snowFall > 20)
+        snowFall = 0;
+    else
+        snowFall+=0.3;
+
+    if (precipCounter < 50) {
+        return;
+    }
+
+
+    if (rainAngle<20 && state == 1) {
+        rainAngle+=1.0;
+        state = 1;
+    }
+    else if (rainAngle == 20) {
+        state = 0;
+        rainAngle = 19;
+    }
+    else if (rainAngle > 0 && state == 0) {
+        rainAngle-=1.0;
+        state = 0;
+    }
+    else if (rainAngle == 0 && state == 0)
+        state = 1;
+
+    if (precipCounter > 90) {
+        precipCounter = 0;
+    }
+
+}
+
 
 void update(int value)
 {
 	counter++;
-    fprintf(stderr,"%d\n", counter);
+    
+    updatePrecip();
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
 	if (camRotX > 730) {
