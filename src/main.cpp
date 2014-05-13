@@ -74,7 +74,7 @@ static GLSLProgram*     shaderProg = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
-const char* window_file = "textures/windows.png";
+const char* window_file = "textures/windows2.png";
 
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
@@ -549,6 +549,7 @@ void drawTreeGround( void )
             glEnd();
         }
     }*/
+
     //generate trunk of tree
     GLfloat color[] = {(GLfloat)(171.0)/255.0,(GLfloat)(158)/255.0, (GLfloat)(114)/255.0, 1};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
@@ -634,7 +635,7 @@ void drawScene( void )
 	glPushMatrix();
 	{
 		glPushMatrix();
-        drawForest();
+        // drawForest();
         glPopMatrix();
 
         glPushMatrix();             //new
@@ -915,7 +916,7 @@ void motion(int x, int y)
 void update(int value)
 {
 	counter++;
-    fprintf(stderr,"%d\n", counter);
+    // fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
 	if (camRotX > 730) {

@@ -3,6 +3,28 @@
 
 #define STRINGIFY(A) #A
 
+const char* windowVS = STRINGIFY(
+
+uniform sampler2D normalMap;\n
+uniform sampler2D colorMap;\n
+
+varying vec3 normal;\n
+varying vec3 vertex;\n
+
+void main() {\n
+
+	gl_Position = ftransform(); \n
+
+	vertex = vec3(gl_ModelViewMatrix * gl_Vertex); \n
+	normal = normalize(gl_NormalMatrix * gl_Normal);\n
+	gl_TexCoord = gl_MultiTexCoord0;\n
+
+	
+
+}
+
+);
+
 const char* generalVS = STRINGIFY(
 
 uniform sampler2D normalMap;\n
