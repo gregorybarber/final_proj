@@ -42,6 +42,32 @@ const char* defaultFS = STRINGIFY(
 
 );
 
+const char* skyVS = STRINGIFY(
+
+	uniform samplerCube cubeMap;\n
+	varying vec3 texCoord0; \n
+
+	void main() {\n
+
+		gl_Position = ftransform(); \n
+		texCoord0 = gl_Normal; \n
+	}
+
+);
+
+const char* skyFS = STRINGIFY(
+
+	uniform samplerCube cubeMap;\n
+	varying vec3 texCoord0; \n
+
+	void main() {
+
+		vec4 colorSample = textureCube(cubeMap, texCoord0);
+		gl_FragColor = colorSample;
+	}
+
+);
+
 const char* windowVS = STRINGIFY(
 
 uniform sampler2D normalMap;\n
