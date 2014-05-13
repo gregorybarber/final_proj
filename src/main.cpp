@@ -52,10 +52,6 @@ char titleString[150];
 
 int seeds[NUM_TREES];
 
-
-bool isTeapot1_selected = false;
-bool isTeapot2_selected = false;
-
 // Lights & Materials
 GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
 GLfloat position[] = {4, 4, 4, 1.0};
@@ -674,10 +670,6 @@ void drawScene( void )
 	glInitNames();
 	glPushName(0);
 
-	setCurrentShader(windowShader);
-	shaderProg->enable();
-    setShadeParam();
-
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
@@ -690,11 +682,13 @@ void drawScene( void )
         precipitation();            
         glPopMatrix();              
 
-
-
 		drawFloor();
 
 		glLoadName(0);
+
+		setCurrentShader(windowShader);
+		shaderProg->enable();
+	    setShadeParam();
 
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		drawObjects();
@@ -708,10 +702,6 @@ void drawScene( void )
 		glTranslatef(20.0,0.0,10.0);
 		drawObjects();
 
-		if( isTeapot2_selected )
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
-		else
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(1);
 
 	}
@@ -809,33 +799,6 @@ void keyboard( unsigned char key, int x, int y )
 		printf("save current screen\n");
 		screenshot.capture();
 		break;
-	case '1': //switch gouraud
-		blinnPhongToggle = 0;
-		gouraudToggle = !gouraudToggle;
-		normalTextureToggle = 0;
-		glutPostRedisplay();
-		break;
-	case '2': //switch blinn-phong
-		gouraudToggle = 0;
-		blinnPhongToggle = !blinnPhongToggle;
-		glutPostRedisplay();
-		break;
-	case '3'://switch checkerboard
-		colorTextureToggle = 0;
-		checkerboardToggle = !checkerboardToggle;
-		glutPostRedisplay();
-		break;
-	case '4'://switch color texture
-		checkerboardToggle = 0;
-		colorTextureToggle = !colorTextureToggle;
-		glutPostRedisplay();
-		break;
-	case '5'://toggle normals - requires blinn-phong
-		normalTextureToggle = !normalTextureToggle;
-		gouraudToggle = 0;
-		blinnPhongToggle = 1;
-		glutPostRedisplay();
-		break;
 	}
 }
 
@@ -888,9 +851,6 @@ void processSelection(int xPos, int yPos)
 		// Collect the hits
 		hits = glRenderMode(GL_RENDER);
 
-		isTeapot1_selected = false;
-		isTeapot2_selected = false;
-
 		// If hit(s) occurred, display the info.
 		if(hits != 0)
 		{
@@ -901,14 +861,6 @@ void processSelection(int xPos, int yPos)
 
 			sprintf (titleString, "You clicked on %d", pickedObj);
 			glutSetWindowTitle(titleString);
-
-			if (pickedObj == 0) {
-				isTeapot1_selected = true;
-			}
-
-			if (pickedObj == 1) {
-				isTeapot2_selected = true;
-			}
 
 		}
 		else
