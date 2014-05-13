@@ -32,7 +32,7 @@ using namespace std;
 
 #define BUFFER_LENGTH 64
 #define NUM_OBJ 5
-#define NUM_TREES 40
+#define NUM_TREES 20
 
 GLfloat camRotX, camRotY, camPosX, camPosY, camPosZ;
 GLint viewport[4];
@@ -119,7 +119,7 @@ void setupRC()
 	camPosZ = -30.5f;   //-10.5
 
 	glEnable(GL_DEPTH_TEST);
-	glShadeModel(GL_SMOOTH);
+	//glShadeModel(GL_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	initLights();
@@ -195,9 +195,9 @@ void drawBox( GLfloat height, GLfloat width )
         glVertex3f(0.0f,0.0f,0.0f);
         glTexCoord2f (1.0, 0.0);
         glVertex3f(0.0f,height,0.0f);
-        glTexCoord2f (1.0, 1.0);
+        glTexCoord2f (1.0, height);
         glVertex3f(0.0f,height,width);
-        glTexCoord2f (0.0, 1.0);
+        glTexCoord2f (0.0,height);
         glVertex3f(0.0f,0.0f,width);
     }
     glEnd();
@@ -208,9 +208,9 @@ void drawBox( GLfloat height, GLfloat width )
         glVertex3f(width,0.0f,0.0f);
         glTexCoord2f (1.0, 0.0);
         glVertex3f(width,0.0f,width);
-        glTexCoord2f (1.0, 1.0);
+        glTexCoord2f (1.0, height);
         glVertex3f(width,height,width);
-        glTexCoord2f (0.0, 1.0);
+        glTexCoord2f (0.0, height);
         glVertex3f(width,height,0.0f);
     }
     glEnd();
@@ -331,12 +331,12 @@ void createObjects( void )
 {
 	Node *nodeOne = new Node(0.0f,0.0f,0.0f,12.0f,3.0f,0,0.06f);
 	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,50,0.04f);
-	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,75,0.02f);
+	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,75,0.06f);
 	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,100,0.08f);
-	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,60,0.04f);
+	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,60,0.07f);
 	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,150,0.10f);
-	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.06f);
-	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.04f);
+	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
+	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.09f);
 	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
 	int i;
 	for(size_t i=0; i < nodeMap.size(); i++) {
@@ -413,7 +413,7 @@ void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
                  glRotated(angleY,1,1,0);
                  glRotated(angleZ,0,1,0);
 			//Draw foliage - partial spheres
-		       // gluSphere(quadObj, .5, 5, 2);
+		        gluSphere(quadObj, .5, 5, 2);
 			//if spring, draw flowers at the edges of the foliage
                 if (season == 1) {
 		            GLfloat flowerColor[] = {(GLfloat)(200)/255.0,(GLfloat)(152)/255.0, (GLfloat)(248)/255.0, .75};
@@ -497,11 +497,11 @@ void drawTreeGround( void )
     GLfloat ground[] = {(GLfloat)(65.0)/255.0,(GLfloat)(186.0)/255.0, (GLfloat)(83.0)/255.0, 1};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, ground);
     if (season == 4) {
-	GLfloat winterGround[] = {(GLfloat)(255.0)/255.0,(GLfloat)(255.0)/255.0, (GLfloat)(255.0)/255.0, 1};
+	    GLfloat winterGround[] = {(GLfloat)(255.0)/255.0,(GLfloat)(255.0)/255.0, (GLfloat)(255.0)/255.0, 1};
         glMaterialfv(GL_FRONT, GL_DIFFUSE, winterGround);
     }
     //randomize all branch angles and lengths using this starting seed
-    //srand(seed);
+
     //draw ground
     glBegin(GL_QUADS);
     glVertex3f(-1000,1000,-1);
@@ -509,6 +509,7 @@ void drawTreeGround( void )
     glVertex3f(1000,-1000,-1);
     glVertex3f(1000,1000,-1);
     glEnd();
+
     //in fall, generate falling leaves
     for (i=0; i<100; i++) { 
 		randZ = randFloat(-6,6);
@@ -568,6 +569,16 @@ void drawTree( void )
 
 void drawForest( void )
 {
+    
+    glEnable( GL_POINT_SMOOTH); 
+    glEnable( GL_DEPTH_TEST );
+    glPointSize(6.0);
+   
+    glShadeModel(GL_SMOOTH);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+    glClearColor(0.0,0.0,0.0,1.0);
+    initLights();
     int i;
     glTranslatef(4,0,7);
     for (i=0;i<NUM_TREES;i++) {
@@ -579,15 +590,6 @@ void drawForest( void )
         glPopMatrix();
 
     }
-    /*glTranslatef(6,0,7);
-    srand(seeds[0]);
-    drawTree();
-    glTranslatef(1,0,0);
-    srand(seeds[1]);
-    drawTree();
-    glTranslatef(1,0,1);
-    srand(seeds[2]);
-    drawTree();*/
 }
 
 void drawScene( void )
@@ -611,7 +613,7 @@ void drawScene( void )
 	glInitNames();
 	glPushName(0);
 
-	setShadeParam();
+	
 
 
 
@@ -622,9 +624,10 @@ void drawScene( void )
         drawForest();
         glPopMatrix();
 
-
+        setShadeParam();
 
 		drawFloor();
+
 		if( isTeapot1_selected )
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		else
@@ -904,22 +907,11 @@ void motion(int x, int y)
 
 }
 
-/*void update (int value)
-{
-	int i = 0;
-	while(nodeMap[i] != NULL) {
-		if (counter > nodeMap[i]->start) {
-			nodeMap[i]->height+= .05;
-		}
-		i++;
-	}
-	glutPostRedisplay();
-	glutTimerFunc(200,update,0);
-}*/
 
 void update(int value)
 {
 	counter++;
+    fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
 	if (camRotX > 730) {
@@ -927,14 +919,14 @@ void update(int value)
 	//	camRotY+= .3;
 	}
 	if (camRotY < 692) {
-		camRotY+= .05;
+		camRotY+= .07;
 		//camPosZ += .2;
 	}
 	if (camPosZ < -23) {
-		camPosZ +=.05;
+		camPosZ +=.07;
 	}
 	display();
-	glutTimerFunc(25, update, 0);
+	glutTimerFunc(20, update, 0);
 }
 
 void randSeeds( void )
@@ -965,7 +957,7 @@ int main (int argc, char *argv[])
 	glutKeyboardFunc( keyboard );
 	glutMouseFunc( mouse );
 	glutMotionFunc( motion );
-    glutTimerFunc(25, update, 0);
+    glutTimerFunc(20, update, 0);
 	glutMainLoop();
 	delete shaderProg;
 }

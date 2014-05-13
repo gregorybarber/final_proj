@@ -23,3 +23,23 @@ links go here
 - Reflections / Refractions
 
 ohshitohshitohshit
+
+###TODO
+
+####GREG
+
+- Particle effects (rain)
+- Sky effect (cube map)
+- Texture mapping (non-scaling)
+
+#####YUJIN
+
+- Shader toggling (inc. gl shader)
+- Texture for ground
+
+#####EH?
+
+- Reflections 
+
+
+
