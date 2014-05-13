@@ -42,7 +42,7 @@ GLdouble projection[16];
 GLint counter = 0;
 class Node;
 
-int season = 2;
+int season = 3;
 int angle = 0;
 
 
@@ -966,7 +966,7 @@ void update(int value)
     // fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
-	if (camRotX > 730) {
+	if (camRotX > 725) {
 		camRotX-= .09;
 	//	camRotY+= .3;
 	}
@@ -974,7 +974,7 @@ void update(int value)
 		camRotY+= .07;
 		//camPosZ += .2;
 	}
-	if (camPosZ < -23) {
+	if (camPosZ < -19) {
 		camPosZ +=.07;
 	}
 	display();
