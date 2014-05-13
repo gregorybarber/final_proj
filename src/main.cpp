@@ -360,7 +360,7 @@ void createObjects( void )
 	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,60,0.07f);
 	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,150,0.10f);
 	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
-	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.09f);
+	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,2.0f,65,0.09f);
 	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
 
     Node *nodeTen = new Node(0.0f,0.0f,0.0f,2.0f,3.0f,50,0.04f);
