@@ -68,19 +68,24 @@ static GLScreenCapturer screenshot("screenshot-%d.ppm");
 static GLSLProgram*     shaderProg = NULL;
 static GLSLProgram* windowShader = NULL;
 static GLSLProgram* defaultShader = NULL;
+static GLSLProgram* skyboxShader = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
 const char* window_file = "textures/windows.png";
 
+const char* skybox_front = "textures/sky/plain_sky_front.png";
+const char* skybox_back = "textures/sky/plain_sky_back.png";
+const char* skybox_up = "textures/sky/plain_sky_top.png";
+const char* skybox_down = "textures/sky/plain_sky_bottom.png";
+const char* skybox_right = "textures/sky/plain_sky_right.png";
+const char* skybox_left = "textures/sky/plain_sky_left.png";
+
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
+static GLuint skybox_texture_id;
 
-static GLint gouraudToggle;
-static GLint blinnPhongToggle;
-static GLint colorTextureToggle;
-static GLint normalTextureToggle;
-static GLint checkerboardToggle;
+GLuint skybox_id;
 
 void initLights(void)
 {
@@ -128,6 +133,7 @@ void setShadeParam( void ) //give parameters as toggle and light direction
 	shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
 	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
 	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
 }
 
 
@@ -323,6 +329,23 @@ void drawFloor( void )
 }
 
 
+void initSky() {
+    // GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, 1.0};
+    // glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, green);
+    GLUquadricObj *sphere=NULL;
+     sphere = gluNewQuadric();
+     gluQuadricDrawStyle(sphere, GLU_FILL);
+     gluQuadricTexture(sphere, GLU_TRUE);
+     gluQuadricNormals(sphere, GLU_SMOOTH);
+      // Making a display list
+     skybox_id = glGenLists(1);
+     glNewList(skybox_id, GL_COMPILE);
+      gluSphere(sphere, 50, 20, 20);
+     glEndList();
+     gluDeleteQuadric(sphere);
+}
+
+
 void createObjects( void ) 
 {
 	Node *nodeOne = new Node(0.0f,0.0f,0.0f,12.0f,3.0f,0,0.06f);
@@ -335,7 +358,7 @@ void createObjects( void )
 	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.09f);
 	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
 	
-
+	initSky();
 }
 
 void drawObjects( void ) 
@@ -506,12 +529,12 @@ void drawTreeGround( void )
     //randomize all branch angles and lengths using this starting seed
 
     //draw ground
-    glBegin(GL_QUADS);
-    glVertex3f(-1000,1000,-1);
-    glVertex3f(-1000,-1000,-1);
-    glVertex3f(1000,-1000,-1);
-    glVertex3f(1000,1000,-1);
-    glEnd();
+    // glBegin(GL_QUADS);
+    // glVertex3f(-1000,1000,-1);
+    // glVertex3f(-1000,-1000,-1);
+    // glVertex3f(1000,-1000,-1);
+    // glVertex3f(1000,1000,-1);
+    // glEnd();
 
     //in fall, generate falling leaves
     /*for (i=0; i<100; i++) { 
@@ -635,23 +658,6 @@ void precipitation( void )
     }
 }
 
-
-void initSky() {
-    GLfloat green[] = {(GLfloat)(91)/255.0,(GLfloat)(153)/255.0, (GLfloat)(84)/255.0, 1.0};
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, green);
-    GLUquadricObj *sphere=NULL;
-     sphere = gluNewQuadric();
-     gluQuadricDrawStyle(sphere, GLU_FILL);
-     gluQuadricTexture(sphere, GLU_TRUE);
-     gluQuadricNormals(sphere, GLU_SMOOTH);
-      //Making a display list
-     // mysphereID = glGenLists(1);
-     // glNewList(mysphereID, GL_COMPILE);
-      gluSphere(sphere, 50, 20, 20);
-     //glEndList();
-     gluDeleteQuadric(sphere);
-}
-
 void drawScene( void )
 {
 	GLfloat density = 0.3;
@@ -677,7 +683,10 @@ void drawScene( void )
 	glPushMatrix();
 	{
 
-        initSky();
+        // initSky();
+
+		setCurrentShader(skyboxShader);
+		glCallList(skybox_id);
 
         setCurrentShader(defaultShader);
         drawFloor();
@@ -767,12 +776,7 @@ static void setupShaders()
 
 	windowShader = new GLSLProgram(windowVS, windowFS);
 	defaultShader = new GLSLProgram(defaultVS, defaultFS);
-
-	gouraudToggle = 1;
-	blinnPhongToggle = 0;
-	checkerboardToggle = 0;
-	colorTextureToggle = 0;
-	normalTextureToggle = 0;
+	skyboxShader = new GLSLProgram(skyVS, skyFS);
 
 	glActiveTexture(GL_TEXTURE0);
 	normal_texture_id = SOIL_load_OGL_texture(window_file, 
@@ -789,6 +793,17 @@ static void setupShaders()
 		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
 	if (color_texture_id == 0)
 		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << color_file << ")" << endl;
+
+	glActiveTexture(GL_TEXTURE2);
+	skybox_texture_id = SOIL_load_OGL_cubemap(skybox_back, skybox_front, 
+											  skybox_up, skybox_down, 
+											  skybox_right, skybox_left,
+											  SOIL_LOAD_RGB,
+											  SOIL_CREATE_NEW_ID,
+											  0
+											);
+	if (skybox_texture_id == 0) 
+		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << "skybox" << ")" << endl;
 }
 
 void keyboard( unsigned char key, int x, int y )
