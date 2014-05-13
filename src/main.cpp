@@ -338,10 +338,17 @@ void createObjects( void )
 	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
 	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,3.0f,65,0.09f);
 	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
-	int i;
-	for(size_t i=0; i < nodeMap.size(); i++) {
-		nodeMap[i]->drawSelf();
-	}
+	
+
+}
+
+void drawObjects( void ) 
+{
+    int i;
+    for(size_t i=0; i < nodeMap.size(); i++) {
+        nodeMap[i]->drawSelf();
+
+    }
 }
 
 float randFloat(const float& min, const float& max) {
@@ -511,7 +518,7 @@ void drawTreeGround( void )
     glEnd();
 
     //in fall, generate falling leaves
-    for (i=0; i<100; i++) { 
+    /*for (i=0; i<100; i++) { 
 		randZ = randFloat(-6,6);
         randX = randFloat(-6,6);
 		GLfloat height = randFloat(10.0,18.0);
@@ -541,7 +548,7 @@ void drawTreeGround( void )
             glVertex3f(randX,randZ,rate*snowFall+start);
             glEnd();
         }
-    }
+    }*/
     //generate trunk of tree
     GLfloat color[] = {(GLfloat)(171.0)/255.0,(GLfloat)(158)/255.0, (GLfloat)(114)/255.0, 1};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
@@ -592,6 +599,16 @@ void drawForest( void )
     }
 }
 
+GLfloat rainFall = 0.0;
+
+void rainEffects( void )
+{
+
+
+
+
+}
+
 void drawScene( void )
 {
 	GLfloat density = 0.3;
@@ -613,10 +630,6 @@ void drawScene( void )
 	glInitNames();
 	glPushName(0);
 
-	
-
-
-
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
@@ -624,43 +637,34 @@ void drawScene( void )
         drawForest();
         glPopMatrix();
 
+        glPushMatrix();             //new
+        rainEffects();              //new
+        glPopMatrix();              //new
+
         setShadeParam();
 
 		drawFloor();
 
-		if( isTeapot1_selected )
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
-		else
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(0);
-		//Node *newNode = new Node(2.0,3.0,0,5);
-		//newNode->drawSelf();
-		//delete newNode;
-	//	int i;
+
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
-		createObjects();
+		drawObjects();
 		glTranslatef(0.0,0.0,10.0);
-		createObjects();
+		drawObjects();
 		glTranslatef(10.0,0.0,-10.0);
-		createObjects();
+		drawObjects();
 		glTranslatef(10.0,0.0,10.0);
-		createObjects();
-		//mult = 2.0;
+		drawObjects();
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glTranslatef(20.0,0.0,10.0);
-		createObjects();
-		//for (i = 0; i<1; i++) {
-	//			nodeMap[i]->drawSelf();
-	//	}
-		//glutSolidTeapot(2.5);
-        //drawBox();
+		drawObjects();
+
 		if( isTeapot2_selected )
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
 		else
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		glLoadName(1);
-	//	glTranslatef(0,0,5);
-	//	glutSolidTeapot(1.5);
+
 	}
 	glPopMatrix();
 	shaderProg->disable();
@@ -950,7 +954,7 @@ int main (int argc, char *argv[])
 	glutCreateWindow( "Final Project!!!" );
 	setupShaders();
 	setupRC();
-	//createObjects();
+	createObjects();
 
 	glutDisplayFunc( display );
 	glutReshapeFunc( reshape );
