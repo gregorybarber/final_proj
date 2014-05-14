@@ -673,15 +673,16 @@ void precipitation( void )
     int i;
 
         GLfloat streak = randFloat(0,1);
-        GLfloat rainColor[] = {1, 1, 1, .5};
+        GLfloat rainColor[] = {1, 1, 1, .8};
         GLfloat xAngling = randFloat(-.3,.3)*(rainAngle);
+        season = 4;
 
         for (i=0;i<10000;i++) {
             GLfloat zPos = randFloat(-30,30);
             GLfloat xPos = randFloat(-30,30);
             GLfloat height = randFloat(0,40);
             
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, rainColor);
+            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, rainColor);
             if (season != 4) {
                  glBegin(GL_LINES);
                  glVertex3f(xPos,height-rainFall,zPos);
@@ -690,16 +691,16 @@ void precipitation( void )
             }
             
             else { 
-                GLfloat winterColor[] = {1, 1, 1, 1};
-              //  glMaterialfv(GL_FRONT, GL_DIFFUSE, winterColor);
-                glPointSize(100);
+                GLfloat winterColor[] = {1, 1, 1, .8};
+               glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
+                glPointSize(3);
                 glPushMatrix();
-                glTranslatef(xPos, height-rainFall, zPos);
-                glutSolidSphere(.05,5,5);
+                // glTranslatef(xPos, height-rainFall, zPos);
+                // glutSolidSphere(.05,5,5);
                 glPopMatrix();
-                //glBegin(GL_POINTS);
-                //glVertex3f(xPos,height-rainFall,zPos);
-                //glEnd();
+                glBegin(GL_POINTS);
+                glVertex3f(xPos,height-rainFall,zPos);
+                glEnd();
             }
         }
    // }
@@ -734,7 +735,7 @@ void drawScene( void )
 		glCallList(skybox_id);
 
         setCurrentShader(defaultShader);
-        //glPushMatrix();            
+        //glPushMatrix();
         precipitation();            
        // glPopMatrix();
 
