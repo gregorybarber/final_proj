@@ -770,6 +770,11 @@ void drawBuildings( void) {
 	        drawShortObjects();
 	        glPopMatrix();
 
+             glPushMatrix();
+            glTranslatef(25.0,0.0,20.0);
+            drawShortObjects();
+            glPopMatrix();
+
 	        glPushMatrix();
 	        glTranslatef(-10.0,0.0,10.0);
 	        drawShortObjects();
@@ -1201,7 +1206,7 @@ void createTrees( void )
     int i, j;
     for (i=0; i<NUM_TREES; i++) {
         GLfloat x = randFloat(0.0,5.0);
-        GLfloat z = randFloat(0.0,5.0);
+        GLfloat z = randFloat(0.0,7.0);
         Tree *newTree = new Tree(x,0.0,z);
         branch *trunk = new branch();
         newTree->trunk = trunk;
