@@ -333,7 +333,7 @@ void drawFloor( void )
 	shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
 	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
 	shaderProg->bind_texture("perlinMap", perlin_texture_id, GL_TEXTURE_2D, 2);
-	shaderProg->set_uniform_1f("reflectance", 0.0);
+	shaderProg->set_uniform_1f("reflectance", 0.5);
 
 	GLfloat color[] = {0.1, 0.1, 0.1, 0.7};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
@@ -500,7 +500,7 @@ void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
                  glRotated(angleY,1,1,0);
                  glRotated(angleZ,0,1,0);
 			     //Draw foliage - partial spheres
-		        gluSphere(quadObj, .5, 5, 2);
+		        gluSphere(quadObj, .5, 3, 2);
 			     //if spring, draw flowers at the edges of the foliage
                 if (season == 1) {
 		            GLfloat flowerColor[] = {(GLfloat)(200)/255.0,(GLfloat)(152)/255.0, (GLfloat)(248)/255.0, .75};
@@ -727,12 +727,12 @@ void precipitation( void )
                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
                 glPointSize(3);
                 glPushMatrix();
-                // glTranslatef(xPos, height-rainFall, zPos);
-                // glutSolidSphere(.05,5,5);
+                 glTranslatef(xPos, height-rainFall, zPos);
+                 glutSolidSphere(.05,5,5);
                 glPopMatrix();
-                glBegin(GL_POINTS);
-                glVertex3f(xPos,height-rainFall,zPos);
-                glEnd();
+               // glBegin(GL_POINTS);
+               // glVertex3f(xPos,height-rainFall,zPos);
+              //  glEnd();
             }
         }
    // }
@@ -857,6 +857,7 @@ void drawReflection( void)
 	glScalef(1.0, -1.0, 1.0);
 	drawSky();
 	drawBuildings();
+    drawForest();
 	glPopMatrix();
 }
 
