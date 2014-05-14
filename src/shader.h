@@ -84,10 +84,13 @@ const char* floorFS = STRINGIFY(
 
 		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st * 0.18);
 
+		vec4 amb = gl_LightSource[0].ambient * colorSample;
+		vec4 dif = gl_LightSource[0].diffuse * max(0.8, intensity) * colorSample;
+
 		// if (colorSample.r > 0.5)
-			gl_FragColor = colorSample;
+			// gl_FragColor = colorSample;
 		// else
-			// gl_FragColor = vec4((colorSample * max(0.4, intensity)).rgb, 1.0);
+		gl_FragColor = amb + dif;
 	}
 
 );
