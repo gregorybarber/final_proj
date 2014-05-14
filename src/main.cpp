@@ -325,6 +325,12 @@ void Node::drawSelf() {
 
 void drawFloor( void )
 {
+	setCurrentShader(floorShader);
+	shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+	shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+
 	GLfloat color[] = {0.1, 0.1, 0.1, 1};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
@@ -647,6 +653,13 @@ void drawTree( void )
 
 void drawForest( void )
 {
+	setCurrentShader(defaultShader);
+	shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+
+	glPushMatrix();
     
     glEnable( GL_POINT_SMOOTH); 
     glEnable( GL_DEPTH_TEST );
@@ -669,6 +682,8 @@ void drawForest( void )
         glPopMatrix();
 
     }
+
+    glPopMatrix();
 }
 
 GLfloat snowFall = 0.0;
@@ -677,6 +692,13 @@ GLfloat rainAngle = 0.0;
 
 void precipitation( void )
 {
+
+	setCurrentShader(defaultShader);
+	shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+
     int i;
 
         GLfloat streak = randFloat(0,1);
@@ -713,6 +735,118 @@ void precipitation( void )
    // }
 }
 
+void drawBuildings( void) {
+
+			setCurrentShader(windowShader);
+			shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+			shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+			shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+			shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+
+	        //DRAW TALL CLUSTERS
+			drawTallObjects();
+
+	        glPushMatrix();
+			glTranslatef(0.0,0.0,10.0);
+			drawTallObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(20.0,0.0,0.0);
+	        drawTallObjects();
+	        glPopMatrix();
+
+	        //DRAW SHORTER CLUSTERS
+	        glPushMatrix();
+	        glTranslatef(0.0,0.0,-10.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(10.0,0.0,0.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(-10.0,0.0,0.0);
+	        drawVeryShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(10.0,0.0,-10.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(-10.0,0.0,-10.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(10.0,0.0,20.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(0.0,0.0,20.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(20.0,0.0,10.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(-10.0,0.0,10.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(20.0,0.0,-20.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(20.0,0.0,-10.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+
+	        //DRAW SHORTEST OBJECTS
+	        glPushMatrix();
+	        glTranslatef(0.0,0.0,-20.0);
+	        drawVeryShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(-10.0,0.0,-20.0);
+	        drawVeryShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(10.0,0.0,-20.0);
+	        drawShortObjects();
+	        glPopMatrix();
+
+	        glPushMatrix();
+	        glTranslatef(20.0,0.0,20.0);
+	        drawVeryShortObjects();
+	        glPopMatrix();
+
+}
+
+void drawSky( void) {
+
+		setCurrentShader(skyboxShader);
+		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+		glCallList(skybox_id);
+
+}
+
 void drawScene( void )
 {
 	GLfloat density = 0.3;
@@ -737,146 +871,11 @@ void drawScene( void )
 	// Draw two teapots next to each other in z axis
 	glPushMatrix();
 	{
-
-		setCurrentShader(skyboxShader);
-		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
-		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
-		glCallList(skybox_id);
-
-        setCurrentShader(floorShader);
-        shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
-        shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-        shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
-        shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+		drawSky();
         drawFloor();
-
-		setCurrentShader(windowShader);
-		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
-		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
-
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
-        //DRAW TALL CLUSTERS
-		drawTallObjects();
-
-        glPushMatrix();
-		glTranslatef(0.0,0.0,10.0);
-		drawTallObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(20.0,0.0,0.0);
-        drawTallObjects();
-        glPopMatrix();
-
-        //DRAW SHORTER CLUSTERS
-        glPushMatrix();
-        glTranslatef(0.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(10.0,0.0,0.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(-10.0,0.0,0.0);
-        drawVeryShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(10.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(-10.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(10.0,0.0,20.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(0.0,0.0,20.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(20.0,0.0,10.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(-10.0,0.0,10.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(20.0,0.0,-20.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(20.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
-
-
-        //DRAW SHORTEST OBJECTS
-        glPushMatrix();
-        glTranslatef(0.0,0.0,-20.0);
-        drawVeryShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(-10.0,0.0,-20.0);
-        drawVeryShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(10.0,0.0,-20.0);
-        drawShortObjects();
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(20.0,0.0,20.0);
-        drawVeryShortObjects();
-        glPopMatrix();
-
-
-		setCurrentShader(defaultShader);
-		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
-		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
-
-		glPushMatrix();
         drawForest();
-        glPopMatrix();
-
-        setCurrentShader(defaultShader);
-        shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
-        shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-        shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-        shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
-
-        //glPushMatrix();
+        drawBuildings();
         precipitation();            
-       // glPopMatrix();
-
-
-
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
-		//glTranslatef(10.0,0.0,-10.0);
-		//drawShortObjects();          
-
 	}
 	glPopMatrix();
 
