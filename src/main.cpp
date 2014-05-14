@@ -75,6 +75,7 @@ static GLSLProgram* windowShader = NULL;
 static GLSLProgram* defaultShader = NULL;
 static GLSLProgram* skyboxShader = NULL;
 static GLSLProgram* floorShader = NULL;
+static GLSLProgram* roofShader = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
@@ -158,6 +159,12 @@ void drawBox( GLfloat height, GLfloat width )
 {
       /* draws the sides of a unit cube (0,0,0)-(1,1,1) */
 
+	setCurrentShader(windowShader);
+	shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+	shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+
     glBegin(GL_POLYGON);/* f2: BACK */
 
     {
@@ -211,14 +218,23 @@ void drawBox( GLfloat height, GLfloat width )
         glVertex3f(width,height,0.0f);
     }
     glEnd();
+
+    setCurrentShader(roofShader);
+    shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+    shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+    shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
+    shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+    shaderProg->bind_texture("perlinMap", perlin_texture_id, GL_TEXTURE_2D, 2);
+    shaderProg->set_uniform_1f("reflectance", 0.3);
+
     glBegin(GL_POLYGON);/* f3:TOP */
     { 
         glNormal3f(1.0f,0.0f,0.0f);
         glTexCoord2f (0.0, 0.0);
         glVertex3f(width,height,0.0f);
-         glTexCoord2f (0.0, 0.0);
+         glTexCoord2f (1.0, 0.0);
         glVertex3f(width,height,width);
-         glTexCoord2f (0.0, 1.0);
+         glTexCoord2f (1.0, 1.0);
         glVertex3f(0.0f,height,width);
          glTexCoord2f (0.0, 1.0);
         glVertex3f(0.0f,height,0.0f);
@@ -740,12 +756,6 @@ void precipitation( void )
 
 void drawBuildings( void) {
 
-			setCurrentShader(windowShader);
-			shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
-			shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
-			shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
-			shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
-
 	        //DRAW TALL CLUSTERS
 			drawTallObjects();
 
@@ -953,6 +963,7 @@ static void setupShaders()
 	defaultShader = new GLSLProgram(defaultVS, defaultFS);
 	skyboxShader = new GLSLProgram(skyVS, skyFS);
 	floorShader = new GLSLProgram(floorVS, floorFS);
+	roofShader = new GLSLProgram(roofVS, roofFS);
 
 	normal_texture_id = SOIL_load_OGL_texture(window_file, 
 		                               SOIL_LOAD_AUTO,

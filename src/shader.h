@@ -178,6 +178,78 @@ void main() {
 
 );
 
+const char* roofVS = STRINGIFY(
+
+	uniform sampler2D normalMap;\n
+	uniform sampler2D colorMap;\n
+	uniform sampler2D perlinMap;\n
+	uniform samplerCube cubeMap;\n
+
+	varying vec3 normal;\n
+	varying vec3 vertex;\n
+	varying vec3 refl; \n
+
+	uniform vec3 lightDir; \n
+
+	varying float intensity; \n
+
+	void main() {\n
+
+		gl_Position = ftransform(); \n
+
+		vertex = vec3(gl_ModelViewMatrix * gl_Vertex); \n
+		normal = normalize(gl_NormalMatrix * gl_Normal);\n
+		refl = normalize(reflect(-vertex, normal));
+		gl_TexCoord[0] = gl_MultiTexCoord0;\n
+
+		intensity = dot(normalize(lightDir), normalize(normal));
+
+	}
+
+);
+
+const char* roofFS = STRINGIFY(
+
+	uniform sampler2D normalMap;\n
+	uniform sampler2D colorMap;\n
+	uniform sampler2D perlinMap;\n
+	uniform samplerCube cubeMap;\n
+
+	varying vec3 normal;\n
+	varying vec3 vertex;\n
+	varying vec3 refl;\n
+
+	uniform vec3 lightDir; \n
+
+	uniform float reflectance;\n
+
+	varying float intensity; \n
+
+	void main() {
+
+		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st); \n
+
+		vec4 amb = gl_LightSource[0].ambient * colorSample; \n
+		vec4 dif = gl_LightSource[0].diffuse * max(1.0, intensity) * colorSample; \n
+
+		float alpha = texture2D(perlinMap, gl_TexCoord[0].st).r; \n
+
+		vec4 ground = vec4((amb + dif).rgb, 1.0); \n
+
+		vec4 cubeSample = textureCube(cubeMap, refl); \n
+
+		if (alpha > reflectance) \n
+			gl_FragColor = ground; \n
+		else { \n
+
+			// gl_FragColor = vec4((amb + dif).rgb, alpha + 1.0 - reflectance);
+			gl_FragColor = mix(cubeSample, ground, alpha + 1.0 - reflectance);
+			// gl_FragColor = cubeSample; \n
+		} \n
+	} \n
+
+);
+
 const char* generalVS = STRINGIFY(
 
 uniform sampler2D normalMap;\n
