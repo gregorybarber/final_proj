@@ -74,10 +74,12 @@ static GLSLProgram*     shaderProg = NULL;
 static GLSLProgram* windowShader = NULL;
 static GLSLProgram* defaultShader = NULL;
 static GLSLProgram* skyboxShader = NULL;
+static GLSLProgram* floorShader = NULL;
 
 const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
 const char* window_file = "textures/windows.png";
+const char* asphalt_file = "textures/asphalt.png";
 
 const char* skybox_front = "textures/sky/plain_sky_front.png";
 const char* skybox_back = "textures/sky/plain_sky_back.png";
@@ -89,6 +91,7 @@ const char* skybox_left = "textures/sky/plain_sky_left.png";
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
 static GLuint skybox_texture_id;
+static GLuint asphalt_texture_id;
 
 GLuint skybox_id;
 
@@ -145,7 +148,7 @@ void setShadeParam( void ) //give parameters as toggle and light direction
 static void setCurrentShader(GLSLProgram* s) {
 	shaderProg = s;
 	s->enable();
-	setShadeParam();
+	// setShadeParam();
 	// glutPostRedisplay();
 }
 
@@ -326,10 +329,10 @@ void drawFloor( void )
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
 	glBegin(GL_QUADS);
-    	glVertex3f(10000,0,-10000);
-    	glVertex3f(-10000,0,-10000);
-    	glVertex3f(-10000,0,10000);
-    	glVertex3f(10000,0,10000);
+    	glVertex3f(50,0,-50);
+    	glVertex3f(-50,0,-50);
+    	glVertex3f(-50,0,50);
+    	glVertex3f(50,0,50);
     glEnd();
 }
 
@@ -673,9 +676,8 @@ void precipitation( void )
     int i;
 
         GLfloat streak = randFloat(0,1);
-        GLfloat rainColor[] = {1, 1, 1, .8};
+        GLfloat rainColor[] = {1, 1, 1, .5};
         GLfloat xAngling = randFloat(-.3,.3)*(rainAngle);
-        season = 4;
 
         for (i=0;i<10000;i++) {
             GLfloat zPos = randFloat(-30,30);
@@ -684,6 +686,7 @@ void precipitation( void )
             
             glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, rainColor);
             if (season != 4) {
+                glLineWidth(1);
                  glBegin(GL_LINES);
                  glVertex3f(xPos,height-rainFall,zPos);
                  glVertex3f(xPos-xAngling,height-rainFall-streak,zPos);
@@ -691,7 +694,7 @@ void precipitation( void )
             }
             
             else { 
-                GLfloat winterColor[] = {1, 1, 1, .8};
+                GLfloat winterColor[] = {1, 1, 1, .5};
                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
                 glPointSize(3);
                 glPushMatrix();
@@ -732,25 +735,24 @@ void drawScene( void )
 	{
 
 		setCurrentShader(skyboxShader);
+		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
 		glCallList(skybox_id);
 
-        setCurrentShader(defaultShader);
-        //glPushMatrix();
-        precipitation();            
-       // glPopMatrix();
-
-        setCurrentShader(defaultShader);
+        setCurrentShader(floorShader);
+        shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+        shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+        shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
+        shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
         drawFloor();
 
-		setCurrentShader(defaultShader);
-
-		glPushMatrix();
-        drawForest();
-        glPopMatrix();
-
-       
-
 		setCurrentShader(windowShader);
+		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
 
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
         //DRAW TALL CLUSTERS
@@ -845,7 +847,25 @@ void drawScene( void )
         glPopMatrix();
 
 
+		setCurrentShader(defaultShader);
+		shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+		shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+		shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+		shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
 
+		glPushMatrix();
+        drawForest();
+        glPopMatrix();
+
+        setCurrentShader(defaultShader);
+        shaderProg->set_uniform_3f("lightDir", -2.0f, 1.0f, 3.0f);
+        shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
+        shaderProg->bind_texture("colorMap", color_texture_id, GL_TEXTURE_2D, 1);
+        shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+
+        //glPushMatrix();
+        precipitation();            
+       // glPopMatrix();
 
 
 
@@ -915,8 +935,8 @@ static void setupShaders()
 	windowShader = new GLSLProgram(windowVS, windowFS);
 	defaultShader = new GLSLProgram(defaultVS, defaultFS);
 	skyboxShader = new GLSLProgram(skyVS, skyFS);
+	floorShader = new GLSLProgram(floorVS, floorFS);
 
-	glActiveTexture(GL_TEXTURE0);
 	normal_texture_id = SOIL_load_OGL_texture(window_file, 
 		                               SOIL_LOAD_AUTO,
 		                               SOIL_CREATE_NEW_ID,
@@ -924,7 +944,6 @@ static void setupShaders()
 	if (normal_texture_id == 0)
 		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << window_file << ")" << endl;
 
-	glActiveTexture(GL_TEXTURE1);
 	color_texture_id = SOIL_load_OGL_texture(window_file, 
 		                               SOIL_LOAD_AUTO,
 		                               SOIL_CREATE_NEW_ID,
@@ -932,7 +951,6 @@ static void setupShaders()
 	if (color_texture_id == 0)
 		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << color_file << ")" << endl;
 
-	glActiveTexture(GL_TEXTURE2);
 	skybox_texture_id = SOIL_load_OGL_cubemap(skybox_back, skybox_front, 
 											  skybox_up, skybox_down, 
 											  skybox_right, skybox_left,
@@ -942,6 +960,16 @@ static void setupShaders()
 											);
 	if (skybox_texture_id == 0) 
 		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << "skybox" << ")" << endl;
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	asphalt_texture_id = SOIL_load_OGL_texture(asphalt_file, 
+		                               SOIL_LOAD_AUTO,
+		                               SOIL_CREATE_NEW_ID,
+		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+	if (asphalt_texture_id == 0)
+		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << asphalt_file << ")" << endl;
+
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void keyboard( unsigned char key, int x, int y )

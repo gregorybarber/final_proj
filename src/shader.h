@@ -42,6 +42,57 @@ const char* defaultFS = STRINGIFY(
 
 );
 
+const char* floorVS = STRINGIFY(
+
+	uniform sampler2D normalMap;\n
+	uniform sampler2D colorMap;\n
+
+	varying vec3 normal;\n
+	varying vec3 vertex;\n
+
+	uniform vec3 lightDir; \n
+
+	varying float intensity; \n
+
+	void main() {\n
+
+		gl_Position = ftransform(); \n
+
+		vertex = vec3(gl_ModelViewMatrix * gl_Vertex); \n
+		normal = normalize(gl_NormalMatrix * gl_Normal);\n
+		gl_TexCoord[0] = gl_MultiTexCoord0;\n
+
+		intensity = dot(normalize(lightDir), normalize(normal));
+
+	}
+
+);
+
+const char* floorFS = STRINGIFY(
+
+	uniform sampler2D normalMap;\n
+	uniform sampler2D colorMap;\n
+
+	varying vec3 normal;\n
+	varying vec3 vertex;\n
+
+	uniform vec3 lightDir; \n
+
+	varying float intensity; \n
+
+	void main() {
+
+		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st * 0.18);
+
+		// if (colorSample.r > 0.5)
+			gl_FragColor = colorSample;
+		// else
+			// gl_FragColor = vec4((colorSample * max(0.4, intensity)).rgb, 1.0);
+	}
+
+);
+
+
 const char* skyVS = STRINGIFY(
 
 	uniform samplerCube cubeMap;\n
