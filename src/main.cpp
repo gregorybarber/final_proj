@@ -82,12 +82,12 @@ const char* window_file = "textures/windows.png";
 const char* asphalt_file = "textures/asphalt.png";
 const char* perlin_file = "textures/perlin.png";
 
-const char* skybox_front = "textures/sky/plain_sky_front.png";
-const char* skybox_back = "textures/sky/plain_sky_back.png";
-const char* skybox_up = "textures/sky/plain_sky_top.png";
-const char* skybox_down = "textures/sky/plain_sky_bottom.png";
-const char* skybox_right = "textures/sky/plain_sky_right.png";
-const char* skybox_left = "textures/sky/plain_sky_left.png";
+const char* skybox_front = "textures/sky-hack/plain_sky_front.png";
+const char* skybox_back = "textures/sky-hack/plain_sky_back.png";
+const char* skybox_up = "textures/sky-hack/plain_sky_top.png";
+const char* skybox_down = "textures/sky-hack/plain_sky_bottom.png";
+const char* skybox_right = "textures/sky-hack/plain_sky_right.png";
+const char* skybox_left = "textures/sky-hack/plain_sky_left.png";
 
 static GLuint normal_texture_id;
 static GLuint color_texture_id;
