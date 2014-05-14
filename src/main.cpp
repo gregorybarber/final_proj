@@ -693,9 +693,13 @@ void precipitation( void )
                 GLfloat winterColor[] = {1, 1, 1, 1};
               //  glMaterialfv(GL_FRONT, GL_DIFFUSE, winterColor);
                 glPointSize(100);
-                glBegin(GL_POINTS);
-                glVertex3f(xPos,height-rainFall,zPos);
-                glEnd();
+                glPushMatrix();
+                glTranslatef(xPos, height-rainFall, zPos);
+                glutSolidSphere(.05,5,5);
+                glPopMatrix();
+                //glBegin(GL_POINTS);
+                //glVertex3f(xPos,height-rainFall,zPos);
+                //glEnd();
             }
         }
    // }
@@ -1068,7 +1072,10 @@ void updatePrecip( void )
     if (rainFall > 20)
         rainFall = 0;
     else
-        rainFall+=1.0;
+        if (season != 4)
+            rainFall+=1.0;
+        else
+            rainFall+=.4;
 
     if (rainAngle<20 && state == 1) {
         rainAngle+=1.0;
@@ -1089,20 +1096,38 @@ void updatePrecip( void )
         precipCounter = 0;
     }
 
+    if(counter%200 == 0) {
+        if (season == 2)
+            season = 4;
+        else {
+            season = 2;
+        }
+    }
+
+
+
+
 }
 
 void updateTree( void )
 {
 
+    if (season == 2) {
+         if (redGlobal < 255)
+               redGlobal+=.25;
 
-    if (redGlobal < 255)
-        redGlobal+=.25;
+         if (greenGlobal > 40)
+                greenGlobal-=2.0;
 
-    if (greenGlobal > 40)
-        greenGlobal-=2.0;
+         if (blueGlobal > 55)
+              blueGlobal-=.5;
+    }
+    else {
+        redGlobal = 134;
+        greenGlobal = 189;
+        blueGlobal = 75;
 
-    if (blueGlobal > 55)
-        blueGlobal-=.5;
+    }
 
 
 }
