@@ -80,6 +80,7 @@ const char* normal_file = "textures/drops.png";
 const char* color_file = "textures/smooth.png";
 const char* window_file = "textures/windows.png";
 const char* asphalt_file = "textures/asphalt.png";
+const char* perlin_file = "textures/perlin.png";
 
 const char* skybox_front = "textures/sky/plain_sky_front.png";
 const char* skybox_back = "textures/sky/plain_sky_back.png";
@@ -92,6 +93,7 @@ static GLuint normal_texture_id;
 static GLuint color_texture_id;
 static GLuint skybox_texture_id;
 static GLuint asphalt_texture_id;
+static GLuint perlin_texture_id;
 
 GLuint skybox_id;
 
@@ -330,8 +332,10 @@ void drawFloor( void )
 	shaderProg->bind_texture("normalMap", normal_texture_id, GL_TEXTURE_2D, 0);
 	shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
 	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
+	shaderProg->bind_texture("perlinMap", perlin_texture_id, GL_TEXTURE_2D, 2);
+	shaderProg->set_uniform_1f("reflectance", 0.0);
 
-	GLfloat color[] = {0.1, 0.1, 0.1, 1};
+	GLfloat color[] = {0.1, 0.1, 0.1, 0.7};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
 	glBegin(GL_QUADS);
@@ -662,7 +666,6 @@ void drawForest( void )
 	glPushMatrix();
     
     glEnable( GL_POINT_SMOOTH); 
-    glEnable( GL_DEPTH_TEST );
     glPointSize(6.0);
    
     glShadeModel(GL_SMOOTH);
@@ -847,6 +850,16 @@ void drawSky( void) {
 
 }
 
+void drawReflection( void)
+{
+
+	glPushMatrix();
+	glScalef(1.0, -1.0, 1.0);
+	drawSky();
+	drawBuildings();
+	glPopMatrix();
+}
+
 void drawScene( void )
 {
 	GLfloat density = 0.3;
@@ -868,14 +881,15 @@ void drawScene( void )
 	glInitNames();
 	glPushName(0);
 
-	// Draw two teapots next to each other in z axis
+	drawReflection();
+
 	glPushMatrix();
 	{
+		drawFloor();
 		drawSky();
-        drawFloor();
-        drawForest();
-        drawBuildings();
-        precipitation();            
+		drawForest();
+		drawBuildings();
+		precipitation();            
 	}
 	glPopMatrix();
 
@@ -971,6 +985,13 @@ static void setupShaders()
 		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
 	if (asphalt_texture_id == 0)
 		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << asphalt_file << ")" << endl;
+
+	perlin_texture_id = SOIL_load_OGL_texture(perlin_file,
+		                               SOIL_LOAD_AUTO,
+		                               SOIL_CREATE_NEW_ID,
+		                               SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+	if (perlin_texture_id == 0)
+		cerr << "SOIL loading error: '" << SOIL_last_result() << "' (" << perlin_file << ")" << endl;
 
 	glActiveTexture(GL_TEXTURE0);
 }

@@ -46,6 +46,7 @@ const char* floorVS = STRINGIFY(
 
 	uniform sampler2D normalMap;\n
 	uniform sampler2D colorMap;\n
+	uniform sampler2D perlinMap;\n
 
 	varying vec3 normal;\n
 	varying vec3 vertex;\n
@@ -72,25 +73,30 @@ const char* floorFS = STRINGIFY(
 
 	uniform sampler2D normalMap;\n
 	uniform sampler2D colorMap;\n
+	uniform sampler2D perlinMap;\n
 
 	varying vec3 normal;\n
 	varying vec3 vertex;\n
 
 	uniform vec3 lightDir; \n
 
+	uniform float reflectance;\n
+
 	varying float intensity; \n
 
 	void main() {
 
-		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st * 0.18);
+		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st);
 
 		vec4 amb = gl_LightSource[0].ambient * colorSample;
 		vec4 dif = gl_LightSource[0].diffuse * max(0.8, intensity) * colorSample;
 
-		// if (colorSample.r > 0.5)
-			// gl_FragColor = colorSample;
-		// else
-		gl_FragColor = amb + dif;
+		float refl = texture2D(perlinMap, gl_TexCoord[0].st * 0.3).r;
+
+		if (refl > reflectance)
+			gl_FragColor = vec4((amb + dif).rgb, 1.0);
+		else
+			gl_FragColor = vec4((amb + dif).rgb, refl + 1.0 - reflectance);
 	}
 
 );
