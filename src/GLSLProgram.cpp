@@ -118,6 +118,13 @@ void GLSLProgram::set_uniform_3f(const char* name, GLfloat x, GLfloat y, GLfloat
 	glUniform3f(loc, x, y, z);
 }
 
+void GLSLProgram::set_uniform_3fv(const char* name, GLfloat vals[])
+{
+	GLint loc = glGetUniformLocation(prog_, name);
+	assert(loc >= 0);
+	glUniform3f(loc, vals[0], vals[1], vals[2]);
+}
+
 void GLSLProgram::set_uniform_1i(const char* name, GLint x)
 {
 	GLint loc = glGetUniformLocation(prog_, name);

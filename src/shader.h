@@ -32,12 +32,23 @@ const char* defaultFS = STRINGIFY(
 
 	varying float intensity; \n
 
+	uniform vec3 fogColor;
+	uniform float minFogRadius;
+	uniform float maxFogRadius;
+
 	void main() {
 
 		vec3 amb = gl_FrontMaterial.ambient.rgb;
 		vec3 dif = gl_FrontMaterial.diffuse.rgb * intensity;
 		float alpha = gl_FrontMaterial.diffuse.a;
-		gl_FragColor = vec4(amb + dif, alpha);
+
+		vec4 sourceColor = vec4(amb + dif, alpha);
+
+		float dist = length(vertex);
+		float fogfac = (dist - minFogRadius) / (maxFogRadius - minFogRadius);
+		fogfac = clamp(fogfac, 0.0, 1.0);
+
+		gl_FragColor = mix(sourceColor, vec4(fogColor, 1.0), fogfac);
 	}
 
 );
@@ -84,6 +95,10 @@ const char* floorFS = STRINGIFY(
 
 	varying float intensity; \n
 
+	uniform vec3 fogColor;
+	uniform float minFogRadius;
+	uniform float maxFogRadius;
+
 	void main() {
 
 		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st);
@@ -93,10 +108,18 @@ const char* floorFS = STRINGIFY(
 
 		float refl = texture2D(perlinMap, gl_TexCoord[0].st * 0.3).r;
 
+		vec4 sourceColor;
+
 		if (refl > reflectance)
-			gl_FragColor = vec4((amb + dif).rgb, 1.0);
+			sourceColor = vec4((amb + dif).rgb, 1.0);
 		else
-			gl_FragColor = vec4((amb + dif).rgb, refl + 1.0 - reflectance);
+			sourceColor = vec4((amb + dif).rgb, refl + 1.0 - reflectance);
+
+		float dist = length(vertex);
+		float fogfac = (dist - minFogRadius) / (maxFogRadius - minFogRadius);
+		fogfac = clamp(fogfac, 0.0, 1.0);
+
+		gl_FragColor = mix(sourceColor, vec4(fogColor, 1.0), fogfac);
 	}
 
 );
@@ -166,14 +189,25 @@ uniform vec3 lightDir; \n
 
 varying float intensity; \n
 
+uniform vec3 fogColor;
+uniform float minFogRadius;
+uniform float maxFogRadius;
+
 void main() {
 
 	vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st * 0.18);
 
+	vec4 sourceColor;
 	if (colorSample.r > 0.5)
-		gl_FragColor = colorSample;
+		sourceColor = colorSample;
 	else
-		gl_FragColor = vec4((colorSample * max(0.4, intensity)).rgb, 1.0);
+		sourceColor = vec4((colorSample * max(0.4, intensity)).rgb, 1.0);
+
+	float dist = length(vertex);
+	float fogfac = (dist - minFogRadius) / (maxFogRadius - minFogRadius);
+	fogfac = clamp(fogfac, 0.0, 1.0);
+
+	gl_FragColor = mix(sourceColor, vec4(fogColor, 1.0), fogfac);
 }
 
 );
@@ -225,6 +259,10 @@ const char* roofFS = STRINGIFY(
 
 	varying float intensity; \n
 
+	uniform vec3 fogColor;
+	uniform float minFogRadius;
+	uniform float maxFogRadius;
+
 	void main() {
 
 		vec4 colorSample = texture2D(colorMap, gl_TexCoord[0].st); \n
@@ -238,14 +276,23 @@ const char* roofFS = STRINGIFY(
 
 		vec4 cubeSample = textureCube(cubeMap, refl); \n
 
+		vec4 sourceColor;
+
 		if (alpha > reflectance) \n
-			gl_FragColor = ground; \n
+			sourceColor = ground; \n
 		else { \n
 
 			// gl_FragColor = vec4((amb + dif).rgb, alpha + 1.0 - reflectance);
-			gl_FragColor = mix(cubeSample, ground, alpha + 1.0 - reflectance);
+			sourceColor = mix(cubeSample, ground, alpha + 1.0 - reflectance);
 			// gl_FragColor = cubeSample; \n
 		} \n
+
+		float dist = length(vertex);
+		float fogfac = (dist - minFogRadius) / (maxFogRadius - minFogRadius);
+		fogfac = clamp(fogfac, 0.0, 1.0);
+
+		gl_FragColor = mix(sourceColor, vec4(fogColor, 1.0), fogfac);
+
 	} \n
 
 );

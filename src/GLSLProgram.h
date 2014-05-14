@@ -59,6 +59,7 @@ class GLSLProgram
 		void set_uniform_2f(const char* name, GLfloat x, GLfloat y);
 		void set_uniform_3f(const char* name, GLfloat x, GLfloat y, GLfloat z);
 		void set_uniform_1i(const char* name, GLint x);
+		void set_uniform_3fv(const char* name, GLfloat vals[]);
 
 	private:
 		GLuint compile_program(const char* vsource, const char* fsource, 
