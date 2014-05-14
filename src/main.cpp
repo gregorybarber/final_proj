@@ -623,7 +623,6 @@ public:
 
 Tree::Tree(GLfloat x, GLfloat y, GLfloat z): pos(x, y, z) {
     this->pos = pos;
-    this->trunk = trunk;
     id = treeCount++;
     treeMap[id] = this;
 }
