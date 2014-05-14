@@ -855,7 +855,6 @@ void drawReflection( void)
 
 	glPushMatrix();
 	glScalef(1.0, -1.0, 1.0);
-	drawSky();
 	drawBuildings();
     drawForest();
 	glPopMatrix();
@@ -886,8 +885,8 @@ void drawScene( void )
 
 	glPushMatrix();
 	{
-		drawFloor();
 		drawSky();
+		drawFloor();
 		drawForest();
 		drawBuildings();
 		precipitation();            
