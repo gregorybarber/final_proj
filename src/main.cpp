@@ -124,7 +124,7 @@ void setupRC()
 	camRotY = 680.0f; //680
 	camPosX = 0.0f;
 	camPosY = 0.0f;
-	camPosZ = -30.5f;   //-10.5
+	camPosZ = -40.5f;   //-10.5
 
 	glEnable(GL_DEPTH_TEST);
 	//glShadeModel(GL_SMOOTH);
@@ -353,7 +353,7 @@ void initSky() {
 
 void createObjects( void ) 
 {
-	Node *nodeOne = new Node(0.0f,0.0f,0.0f,12.0f,3.0f,0,0.06f);
+	Node *nodeOne = new Node(0.0f,0.0f,0.0f,13.0f,3.0f,0,0.06f);
 	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,50,0.04f);
 	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,75,0.06f);
 	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,100,0.08f);
@@ -361,7 +361,7 @@ void createObjects( void )
 	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,150,0.10f);
 	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
 	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,2.0f,65,0.09f);
-	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,15.0f,3.0f,20,0.08f);
+	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,18.0f,3.0f,20,0.08f);
 
     Node *nodeTen = new Node(0.0f,0.0f,0.0f,2.0f,3.0f,50,0.04f);
     Node *nodeElev = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,100,0.02f);
@@ -371,7 +371,17 @@ void createObjects( void )
     Node *nodeFift = new Node(2.5f,0.0f,-2.5f,3.0f,2.0f,200,0.05f);
     Node *nodeSixt = new Node(-7.5f,0.0f,2.5f,4.0f,2.0f,150,0.04f);
     Node *nodeSevent = new Node(-5.0f,0.0f,2.5f,5.0f,3.0f,120,0.05f);
-    Node *nodeEighte = new Node(-5.0f,0.0f,-5.0f,3.0f,3.0f,70,0.06f);	
+    Node *nodeEighte = new Node(-5.0f,0.0f,-5.0f,3.0f,3.0f,70,0.06f);
+
+    Node *lowOne = new Node(0.0f,0.0f,0.0f,1.0f,6.0f,100,0.06f);
+    Node *lowTwo = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,150,0.04f);
+    Node *lowThree = new Node(0.0f,0.0f,3.5f,0.5f,1.0f,175,0.06f);
+    Node *lowFour = new Node(0.0f,0.0f,-2.5f,2.0f,4.0f,200,0.08f);
+    Node *lowFive = new Node(-5.0f,0.0f,0.0f,1.0f,1.5f,160,0.07f);
+    Node *lowSix = new Node(2.5f,0.0f,-2.5f,0.3f,2.0f,250,0.10f);
+    Node *lowSeven = new Node(-7.5f,0.0f,2.5f,4.0f,5.0f,200,0.08f);
+    Node *lowEight = new Node(-5.0f,0.0f,2.5f,2.0f,2.0f,165,0.09f);
+    Node *lowNine = new Node(-5.0f,0.0f,-5.0f,1.8f,3.0f,120,0.08f);	
 
 	
 	initSky();
@@ -389,7 +399,16 @@ void drawTallObjects( void )
 void drawShortObjects( void ) 
 {
     int i;
-    for(size_t i=9; i < nodeMap.size(); i++) {
+    for(size_t i=9; i < 18; i++) {
+        nodeMap[i]->drawSelf();
+
+    }
+}
+
+void drawVeryShortObjects( void )
+{
+    int i;
+    for(size_t i=18; i < nodeMap.size(); i++) {
         nodeMap[i]->drawSelf();
 
     }
@@ -729,51 +748,102 @@ void drawScene( void )
 		setCurrentShader(windowShader);
 
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, selectedColor);
+        //DRAW TALL CLUSTERS
 		drawTallObjects();
+
         glPushMatrix();
 		glTranslatef(0.0,0.0,10.0);
 		drawTallObjects();
         glPopMatrix();
-        glPushMatrix();
-		glTranslatef(0.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(10.0,0.0,0.0);
-		drawShortObjects();
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(-10.0,0.0,0.0);
-        drawShortObjects();
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(10.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(-10.0,0.0,-10.0);
-        drawShortObjects();
-        glPopMatrix();
+
         glPushMatrix();
         glTranslatef(20.0,0.0,0.0);
         drawTallObjects();
         glPopMatrix();
+
+        //DRAW SHORTER CLUSTERS
+        glPushMatrix();
+        glTranslatef(0.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(10.0,0.0,0.0);
+        drawShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(-10.0,0.0,0.0);
+        drawVeryShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(10.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(-10.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+
         glPushMatrix();
         glTranslatef(10.0,0.0,20.0);
         drawShortObjects();
         glPopMatrix();
+
         glPushMatrix();
         glTranslatef(0.0,0.0,20.0);
         drawShortObjects();
         glPopMatrix();
+
         glPushMatrix();
         glTranslatef(20.0,0.0,10.0);
         drawShortObjects();
         glPopMatrix();
 
+        glPushMatrix();
+        glTranslatef(-10.0,0.0,10.0);
+        drawShortObjects();
+        glPopMatrix();
 
-		//glTranslatef(10.0,0.0,10.0);
-		//drawTallObjects();
+        glPushMatrix();
+        glTranslatef(20.0,0.0,-20.0);
+        drawShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(20.0,0.0,-10.0);
+        drawShortObjects();
+        glPopMatrix();
+
+
+        //DRAW SHORTEST OBJECTS
+        glPushMatrix();
+        glTranslatef(0.0,0.0,-20.0);
+        drawVeryShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(-10.0,0.0,-20.0);
+        drawVeryShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(10.0,0.0,-20.0);
+        drawShortObjects();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(20.0,0.0,20.0);
+        drawVeryShortObjects();
+        glPopMatrix();
+
+
+
+
+
+
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, unselectedColor);
 		//glTranslatef(10.0,0.0,-10.0);
 		//drawShortObjects();          
