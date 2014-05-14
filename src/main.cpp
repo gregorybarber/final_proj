@@ -329,9 +329,13 @@ void drawFloor( void )
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
 	glBegin(GL_QUADS);
+		glTexCoord2f(25, -25);
     	glVertex3f(50,0,-50);
+    	glTexCoord2f(-25, -25);
     	glVertex3f(-50,0,-50);
+    	glTexCoord2f(-25, 25);
     	glVertex3f(-50,0,50);
+    	glTexCoord2f(25, 25);
     	glVertex3f(50,0,50);
     glEnd();
 }
