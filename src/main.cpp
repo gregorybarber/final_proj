@@ -41,6 +41,7 @@ GLdouble projection[16];
 
 GLint counter = 0;
 class Node;
+class Tree;
 
 int season = 2;
 int angle = 0;
@@ -300,15 +301,8 @@ Node::~Node() {
 void Node::drawSelf() {
     GLfloat color1[] = {5.0, 0.0, 0.0, 1};
     GLfloat currHeight = height;
-  //  if (currentNode == this) {
-  //      glColor4fv(selectedColor);
-  //      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, selectedColor);
-  //  }
-  //  else {
     glColor4fv(color1);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
-    // glMaterialfv(GL_FRONT, GL_DIFFUSE, color1);
- //   }
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);        
     if (counter > start) {
     	currHeight = (counter-start)*rate;
     	if (currHeight > height)
@@ -317,9 +311,8 @@ void Node::drawSelf() {
     	{
     	    glTranslatef(pos[0], pos[1], pos[2]);
     	    drawBox(currHeight,width);
-   	     //glutSolidSphere(0.1, 10, 10);
    		 }
-   	 glPopMatrix();
+   	    glPopMatrix();
    	}
 
 }
@@ -368,41 +361,7 @@ void initSky() {
 }
 
 
-void createObjects( void ) 
-{
-	Node *nodeOne = new Node(0.0f,0.0f,0.0f,13.0f,3.0f,0,0.06f);
-	Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,50,0.04f);
-	Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,75,0.06f);
-	Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,100,0.08f);
-	Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,60,0.07f);
-	Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,150,0.10f);
-	Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
-	Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,2.0f,65,0.09f);
-	Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,18.0f,3.0f,20,0.08f);
 
-    Node *nodeTen = new Node(0.0f,0.0f,0.0f,2.0f,3.0f,50,0.04f);
-    Node *nodeElev = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,100,0.02f);
-    Node *nodeTwel = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,125,0.03f);
-    Node *nodeThir = new Node(0.0f,0.0f,-2.5f,3.0f,2.0f,150,0.04f);
-    Node *nodeFourt = new Node(-5.0f,0.0f,0.0f,2.0f,1.5f,110,0.06f);
-    Node *nodeFift = new Node(2.5f,0.0f,-2.5f,3.0f,2.0f,200,0.05f);
-    Node *nodeSixt = new Node(-7.5f,0.0f,2.5f,4.0f,2.0f,150,0.04f);
-    Node *nodeSevent = new Node(-5.0f,0.0f,2.5f,5.0f,3.0f,120,0.05f);
-    Node *nodeEighte = new Node(-5.0f,0.0f,-5.0f,3.0f,3.0f,70,0.06f);
-
-    Node *lowOne = new Node(0.0f,0.0f,0.0f,1.0f,6.0f,100,0.06f);
-    Node *lowTwo = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,150,0.04f);
-    Node *lowThree = new Node(0.0f,0.0f,3.5f,0.5f,1.0f,175,0.06f);
-    Node *lowFour = new Node(0.0f,0.0f,-2.5f,2.0f,4.0f,200,0.08f);
-    Node *lowFive = new Node(-5.0f,0.0f,0.0f,1.0f,1.5f,160,0.07f);
-    Node *lowSix = new Node(2.5f,0.0f,-2.5f,0.3f,2.0f,250,0.10f);
-    Node *lowSeven = new Node(-7.5f,0.0f,2.5f,4.0f,5.0f,200,0.08f);
-    Node *lowEight = new Node(-5.0f,0.0f,2.5f,2.0f,2.0f,165,0.09f);
-    Node *lowNine = new Node(-5.0f,0.0f,-5.0f,1.8f,3.0f,120,0.08f);	
-
-	
-	initSky();
-}
 
 void drawTallObjects( void ) 
 {
@@ -442,13 +401,16 @@ typedef struct branch branch;
 struct branch {
     GLdouble bottomWidth, topWidth;
     GLdouble length;
+    branch *child;
 } ;
+
+
 
 
 void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
 {    
     int j;
-    branch* limb = new branch();
+    branch* limb = trunk->child;
     GLfloat lengthMult = (GLfloat)(rand()%+3)/10.0;
     limb->bottomWidth = trunk->topWidth;
     limb->topWidth = (limb->bottomWidth)*(lengthMult);
@@ -525,7 +487,7 @@ void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
         
 void drawBranches( int numBranches, branch* trunk, GLUquadricObj *quadObj)
 {
-    branch* limb = new branch();
+    branch* limb = trunk->child;
     int level = 7;
     int count = 0;
     limb->length = trunk->length;
@@ -568,11 +530,10 @@ void drawBranches( int numBranches, branch* trunk, GLUquadricObj *quadObj)
 
 }
 
-void drawTreeGround( void )
+void drawTreeGround( branch *trunk)
 {
     int i;
     GLfloat randZ, randX;
-    branch* trunk = new branch();
     glPushMatrix();
     GLUquadricObj *quadObj;
     glLoadName(0);
@@ -587,15 +548,6 @@ void drawTreeGround( void )
 	    GLfloat winterGround[] = {(GLfloat)(255.0)/255.0,(GLfloat)(255.0)/255.0, (GLfloat)(255.0)/255.0, 1};
         glMaterialfv(GL_FRONT, GL_DIFFUSE, winterGround);
     }
-    //randomize all branch angles and lengths using this starting seed
-
-    //draw ground
-    // glBegin(GL_QUADS);
-    // glVertex3f(-1000,1000,-1);
-    // glVertex3f(-1000,-1000,-1);
-    // glVertex3f(1000,-1000,-1);
-    // glVertex3f(1000,1000,-1);
-    // glEnd();
 
     //in fall, generate falling leaves
     /*for (i=0; i<100; i++) { 
@@ -612,22 +564,6 @@ void drawTreeGround( void )
             glVertex3f(randX,randZ,falling+height);
             glEnd();
         }
-    }
-    //in winter, generate falling snow
-    for (i=0; i<1000; i++) {
-		randZ = randFloat(-50,50);
-        randX = randFloat(-50,50);
-        GLfloat start = randFloat(10.0,50.0);
-		GLfloat rate = randFloat(.6,1.0);
-        if (start+falling < 0.0) 
-	    	start = 0.0;
-        if (season == 4) {
-            GLfloat winter[] = {(GLfloat)(300)/255.0,(GLfloat)(300)/255.0, (GLfloat)(300)/255.0, .4};
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, winter);
-            glBegin(GL_POINTS);
-            glVertex3f(randX,randZ,rate*snowFall+start);
-            glEnd();
-        }
     }*/
 
     //generate trunk of tree
@@ -638,11 +574,11 @@ void drawTreeGround( void )
     trunk->topWidth = .02;
     trunk->length = 1.3;
     //generate branches off of starting trunk
-    drawBranches(numBranches, trunk,quadObj);
+    drawBranches(numBranches,trunk,quadObj);
     glPopMatrix();
 }
 
-void drawTree( void )
+void drawTree( branch* trunk )
 {
     
     float currentColor[4];
@@ -651,8 +587,49 @@ void drawTree( void )
     // Initialize the name stack
     glInitNames();
     glPushName(0);
-    drawTreeGround();
+    drawTreeGround(trunk);
     glColor4fv(currentColor);
+}
+
+GLuint treeCount = 0;
+map<GLuint, Tree*> treeMap;
+
+class Tree {
+public:
+    Tree(GLfloat x, GLfloat y, GLfloat z); 
+    Tree(const Tree& other);
+    ~Tree();
+    void virtual drawSelf();
+    branch* trunk;
+    GLuint id;
+    Position pos;
+};
+
+Tree::Tree(GLfloat x, GLfloat y, GLfloat z): pos(x, y, z) {
+    this->pos = pos;
+    this->trunk = trunk;
+    id = treeCount++;
+    treeMap[id] = this;
+}
+
+Tree::Tree(const Tree& other) {
+    pos = other.pos;
+    trunk = other.trunk;
+    id = treeCount++;
+    treeMap[id] = this;
+}
+
+Tree::~Tree() {
+    treeMap.erase(id);
+}
+
+void Tree::drawSelf() {
+        glPushMatrix();
+        {
+            glTranslatef(pos[0], pos[1], pos[2]);
+            drawTree(trunk);
+         }
+        glPopMatrix();
 }
 
 void drawForest( void )
@@ -676,16 +653,13 @@ void drawForest( void )
     initLights();
     int i;
     glTranslatef(6,0,7);
-    for (i=0;i<NUM_TREES;i++) {
+    for (size_t i =0;i<treeMap.size();i++) {
         glPushMatrix();
-       // srand(time(NULL));
-        glTranslatef(randFloat(0.0,7.0),0,randFloat(0.0,7.0));
+        glTranslatef(treeMap[i]->pos[0],0,treeMap[i]->pos[2]);
         srand(seeds[i]);
-        drawTree();
+        treeMap[i]->drawSelf();
         glPopMatrix();
-
     }
-
     glPopMatrix();
 }
 
@@ -735,7 +709,6 @@ void precipitation( void )
               //  glEnd();
             }
         }
-   // }
 }
 
 void drawBuildings( void) {
@@ -770,10 +743,7 @@ void drawBuildings( void) {
 	        drawShortObjects();
 	        glPopMatrix();
 
-	        glPushMatrix();
-	        glTranslatef(-10.0,0.0,0.0);
-	        drawVeryShortObjects();
-	        glPopMatrix();
+	        
 
 	        glPushMatrix();
 	        glTranslatef(10.0,0.0,-10.0);
@@ -786,7 +756,7 @@ void drawBuildings( void) {
 	        glPopMatrix();
 
 	        glPushMatrix();
-	        glTranslatef(10.0,0.0,20.0);
+	        glTranslatef(10.0,0.0,30.0);
 	        drawShortObjects();
 	        glPopMatrix();
 
@@ -796,7 +766,7 @@ void drawBuildings( void) {
 	        glPopMatrix();
 
 	        glPushMatrix();
-	        glTranslatef(20.0,0.0,10.0);
+	        glTranslatef(25.0,0.0,10.0);
 	        drawShortObjects();
 	        glPopMatrix();
 
@@ -815,6 +785,11 @@ void drawBuildings( void) {
 	        drawShortObjects();
 	        glPopMatrix();
 
+            glPushMatrix();
+            glTranslatef(10.0,0.0,-20.0);
+            drawShortObjects();
+            glPopMatrix();
+
 
 	        //DRAW SHORTEST OBJECTS
 	        glPushMatrix();
@@ -822,18 +797,18 @@ void drawBuildings( void) {
 	        drawVeryShortObjects();
 	        glPopMatrix();
 
+            glPushMatrix();
+            glTranslatef(-10.0,0.0,0.0);
+            drawVeryShortObjects();
+            glPopMatrix();
+
 	        glPushMatrix();
 	        glTranslatef(-10.0,0.0,-20.0);
 	        drawVeryShortObjects();
 	        glPopMatrix();
 
 	        glPushMatrix();
-	        glTranslatef(10.0,0.0,-20.0);
-	        drawShortObjects();
-	        glPopMatrix();
-
-	        glPushMatrix();
-	        glTranslatef(20.0,0.0,20.0);
+	        glTranslatef(20.0,0.0,25.0);
 	        drawVeryShortObjects();
 	        glPopMatrix();
 
@@ -1221,6 +1196,62 @@ void randSeeds( void )
 }
 
 
+void createTrees( void )
+{
+    int i, j;
+    for (i=0; i<NUM_TREES; i++) {
+        GLfloat x = randFloat(0.0,5.0);
+        GLfloat z = randFloat(0.0,5.0);
+        Tree *newTree = new Tree(x,0.0,z);
+        branch *trunk = new branch();
+        newTree->trunk = trunk;
+        branch *prev = trunk;
+        for (j=0; j< 20; j++) {
+            branch *curr = new branch();
+            prev->child = curr;
+            prev = curr;
+        }
+    }
+}
+
+void createObjects( void ) 
+{
+    Node *nodeOne = new Node(0.0f,0.0f,0.0f,13.0f,3.0f,0,0.06f);
+    Node *nodeTwo = new Node(-2.5f,0.0f,0.0f,5.0f,2.0f,50,0.04f);
+    Node *nodeThree = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,75,0.06f);
+    Node *nodeFour = new Node(0.0f,0.0f,-2.5f,6.0f,2.0f,100,0.08f);
+    Node *nodeFive = new Node(-5.0f,0.0f,0.0f,8.0f,1.5f,60,0.07f);
+    Node *nodeSix = new Node(2.5f,0.0f,-2.5f,5.0f,2.0f,150,0.10f);
+    Node *nodeSeven = new Node(-7.5f,0.0f,2.5f,10.0f,2.0f,100,0.08f);
+    Node *nodeEight = new Node(-5.0f,0.0f,2.5f,4.0f,2.0f,65,0.09f);
+    Node *nodeNine = new Node(-5.0f,0.0f,-5.0f,18.0f,3.0f,20,0.08f);
+
+    Node *nodeTen = new Node(0.0f,0.0f,0.0f,2.0f,3.0f,50,0.04f);
+    Node *nodeElev = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,100,0.02f);
+    Node *nodeTwel = new Node(0.0f,0.0f,3.5f,2.0f,2.0f,125,0.03f);
+    Node *nodeThir = new Node(0.0f,0.0f,-2.5f,3.0f,2.0f,150,0.04f);
+    Node *nodeFourt = new Node(-5.0f,0.0f,0.0f,2.0f,1.5f,110,0.06f);
+    Node *nodeFift = new Node(2.5f,0.0f,-2.5f,3.0f,2.0f,200,0.05f);
+    Node *nodeSixt = new Node(-7.5f,0.0f,2.5f,4.0f,2.0f,150,0.04f);
+    Node *nodeSevent = new Node(-5.0f,0.0f,2.5f,5.0f,3.0f,120,0.05f);
+    Node *nodeEighte = new Node(-5.0f,0.0f,-5.0f,3.0f,3.0f,70,0.06f);
+
+    Node *lowOne = new Node(0.0f,0.0f,0.0f,1.0f,6.0f,100,0.06f);
+    Node *lowTwo = new Node(-2.5f,0.0f,0.0f,1.0f,2.0f,150,0.04f);
+    Node *lowThree = new Node(0.0f,0.0f,3.5f,0.5f,1.0f,175,0.06f);
+    Node *lowFour = new Node(0.0f,0.0f,-2.5f,2.0f,4.0f,200,0.08f);
+    Node *lowFive = new Node(-5.0f,0.0f,0.0f,1.0f,1.5f,160,0.07f);
+    Node *lowSix = new Node(2.5f,0.0f,-2.5f,0.3f,2.0f,250,0.10f);
+    Node *lowSeven = new Node(-7.5f,0.0f,2.5f,4.0f,5.0f,200,0.08f);
+    Node *lowEight = new Node(-5.0f,0.0f,2.5f,2.0f,2.0f,165,0.09f);
+    Node *lowNine = new Node(-5.0f,0.0f,-5.0f,1.8f,3.0f,120,0.08f); 
+
+    createTrees();
+    
+    initSky();
+}
+
+
 int main (int argc, char *argv[])
 {
 	int win_width = 960;
@@ -1234,6 +1265,7 @@ int main (int argc, char *argv[])
 	setupShaders();
 	setupRC();
 	createObjects();
+  
 
 	glutDisplayFunc( display );
 	glutReshapeFunc( reshape );
