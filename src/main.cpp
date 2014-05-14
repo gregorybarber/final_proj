@@ -103,6 +103,8 @@ GLfloat fogColor[] = {0.3, 0.3, 0.3};
 GLfloat minFogRadius = 30.0;
 GLfloat maxFogRadius = 50.0;
 
+GLfloat reflectance = 0.5;
+
 void initLights(void)
 {
 	glEnable(GL_LIGHTING);
@@ -233,7 +235,7 @@ void drawBox( GLfloat height, GLfloat width )
     shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
     shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
     shaderProg->bind_texture("perlinMap", perlin_texture_id, GL_TEXTURE_2D, 2);
-    shaderProg->set_uniform_1f("reflectance", 0.3);
+    shaderProg->set_uniform_1f("reflectance", reflectance);
     shaderProg->set_uniform_3fv("fogColor", fogColor);
     shaderProg->set_uniform_1f("minFogRadius", minFogRadius);
     shaderProg->set_uniform_1f("maxFogRadius", maxFogRadius);
@@ -352,7 +354,7 @@ void drawFloor( void )
 	shaderProg->bind_texture("colorMap", asphalt_texture_id, GL_TEXTURE_2D, 1);
 	shaderProg->bind_texture("cubeMap", skybox_texture_id, GL_TEXTURE_CUBE_MAP, 0);
 	shaderProg->bind_texture("perlinMap", perlin_texture_id, GL_TEXTURE_2D, 2);
-	shaderProg->set_uniform_1f("reflectance", 0.5);
+	shaderProg->set_uniform_1f("reflectance", reflectance);
     shaderProg->set_uniform_3fv("fogColor", fogColor);
     shaderProg->set_uniform_1f("minFogRadius", minFogRadius);
     shaderProg->set_uniform_1f("maxFogRadius", maxFogRadius);
