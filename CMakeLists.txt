@@ -1,6 +1,6 @@
 # CMake project file for W4160 Computer Graphics
 # Changxi Zheng (cxz@cs.columbia.edu)
-project(PA3)
+project(FINAL)
 
 cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
 
@@ -32,7 +32,7 @@ include_directories(
 
 file(GLOB SOIL_SRC "src/soil/*.h" "src/soil/*.c")
 
-add_executable(pa3
+add_executable(final
     src/main.cpp
     src/shader.h
     src/trackball.h         src/trackball.cpp
@@ -40,7 +40,7 @@ add_executable(pa3
     src/GLScreenCapturer.h  src/GLScreenCapturer.cpp
     ${SOIL_SRC}
 )
-target_link_libraries(pa3
+target_link_libraries(final
     ${GLUT_LIBRARIES}       ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARY}
 )
