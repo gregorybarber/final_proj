@@ -46,9 +46,13 @@ class Tree;
 int season = 2;
 int angle = 0;
 
+int mixed = 0;
+int mixedRate = 0;
+
 GLfloat redGlobal = 134;
 GLfloat greenGlobal = 189;
 GLfloat blueGlobal = 75;
+GLfloat transGlobal = .8;
 
 
 
@@ -103,7 +107,7 @@ GLfloat fogColor[] = {0.3, 0.3, 0.3};
 GLfloat minFogRadius = 30.0;
 GLfloat maxFogRadius = 50.0;
 
-GLfloat reflectance = 0.5;
+GLfloat reflectance = 0.3;
 
 void initLights(void)
 {
@@ -476,7 +480,7 @@ void drawTwigs( int count, branch* trunk, GLUquadricObj *quadObj )
                		glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
            		}
                 if (season == 2) {
-                    GLfloat summer[] = {(GLfloat)(redGlobal)/255.0,(GLfloat)(greenGlobal)/255.0, (GLfloat)(blueGlobal)/255.0, .4};
+                    GLfloat summer[] = {(GLfloat)(redGlobal)/255.0,(GLfloat)(greenGlobal)/255.0, (GLfloat)(blueGlobal)/255.0, transGlobal};
                     glMaterialfv(GL_FRONT, GL_DIFFUSE, summer);
                 }
 			     //Two fall colors
@@ -724,25 +728,50 @@ void precipitation( void )
             GLfloat height = randFloat(0,40);
             
             glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, rainColor);
-            if (season != 4) {
-                glLineWidth(1);
-                 glBegin(GL_LINES);
-                 glVertex3f(xPos,height-rainFall,zPos);
-                 glVertex3f(xPos-xAngling,height-rainFall-streak,zPos);
-                glEnd();
+            if (!mixed) {
+                if (season != 4) {
+                    glLineWidth(1);
+                     glBegin(GL_LINES);
+                     glVertex3f(xPos,height-rainFall,zPos);
+                     glVertex3f(xPos,height-rainFall-streak,zPos);
+                    glEnd();
+                }
+                
+                else { 
+                    GLfloat winterColor[] = {1, 1, 1, .5};
+                   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
+                    glPointSize(3);
+                    glPushMatrix();
+                     glTranslatef(xPos, height-rainFall, zPos);
+                     glutSolidSphere(.05,5,5);
+                    glPopMatrix();
+                   // glBegin(GL_POINTS);
+                   // glVertex3f(xPos,height-rainFall,zPos);
+                  //  glEnd();
+                }
             }
-            
-            else { 
-                GLfloat winterColor[] = {1, 1, 1, .5};
-               glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
-                glPointSize(3);
-                glPushMatrix();
-                 glTranslatef(xPos, height-rainFall, zPos);
-                 glutSolidSphere(.05,5,5);
-                glPopMatrix();
-               // glBegin(GL_POINTS);
-               // glVertex3f(xPos,height-rainFall,zPos);
-              //  glEnd();
+            else {
+                if (i%mixedRate == 0) {
+                    glLineWidth(1);
+                     glBegin(GL_LINES);
+                     glVertex3f(xPos,height-rainFall,zPos);
+                     glVertex3f(xPos,height-rainFall-streak,zPos);
+                    glEnd();
+                }
+                
+                else { 
+                    GLfloat winterColor[] = {1, 1, 1, .5};
+                   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, winterColor);
+                    glPointSize(3);
+                    glPushMatrix();
+                     glTranslatef(xPos, height-rainFall, zPos);
+                     glutSolidSphere(.05,5,5);
+                    glPopMatrix();
+                   // glBegin(GL_POINTS);
+                   // glVertex3f(xPos,height-rainFall,zPos);
+                  //  glEnd();
+                }
+
             }
         }
 }
@@ -897,8 +926,9 @@ void drawScene( void )
 	{
 		drawSky();
 		drawFloor();
-		drawForest();
+		
 		drawBuildings();
+        drawForest();
 		precipitation();            
 	}
 	glPopMatrix();
@@ -1141,7 +1171,7 @@ void updatePrecip( void )
         else
             rainFall+=.4;
 
-    if (rainAngle<20 && state == 1) {
+    /*if (rainAngle<20 && state == 1) {
         rainAngle+=1.0;
         state = 1;
     }
@@ -1154,18 +1184,28 @@ void updatePrecip( void )
         state = 0;
     }
     else if (rainAngle == 0 && state == 0)
-        state = 1;
+        state = 1;*/
 
     if (precipCounter > 90) {
         precipCounter = 0;
     }
 
-    if(counter%200 == 0) {
+    if(counter%270==0) {
+        mixed = 0;
         if (season == 2)
             season = 4;
         else {
             season = 2;
         }
+     
+    }
+
+    if ((counter+30)%270 == 0) {
+        mixed = 1;
+    }
+    if (mixed) {
+        if (mixedRate < 10)
+            mixedRate+=1;
     }
 
 
@@ -1177,19 +1217,30 @@ void updateTree( void )
 {
 
     if (season == 2) {
+  
          if (redGlobal < 255)
                redGlobal+=.25;
+         else 
+            redGlobal = 255;
 
          if (greenGlobal > 40)
                 greenGlobal-=2.0;
 
          if (blueGlobal > 55)
               blueGlobal-=.5;
+
+         if (redGlobal > 162) 
+            transGlobal-=.02;
+
+         if (reflectance < .5) 
+             reflectance+=.02;
+         
     }
     else {
         redGlobal = 134;
         greenGlobal = 189;
         blueGlobal = 75;
+        transGlobal = .8;
 
     }
 
