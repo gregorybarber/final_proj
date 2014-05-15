@@ -107,7 +107,7 @@ GLfloat fogColor[] = {0.3, 0.3, 0.3};
 GLfloat minFogRadius = 30.0;
 GLfloat maxFogRadius = 50.0;
 
-GLfloat reflectance = 0.3;
+GLfloat reflectance = 0.0;
 
 void initLights(void)
 {
@@ -1213,27 +1213,36 @@ void updatePrecip( void )
 
 }
 
+GLfloat reflrate = .01;
+
 void updateTree( void )
 {
 
     if (season == 2) {
   
-         if (redGlobal < 255)
-               redGlobal+=.25;
-         else 
-            redGlobal = 255;
+  		if (counter > 100) {
+  			if (redGlobal < 255)
+  			      redGlobal+=.25;
+  			else 
+  			   redGlobal = 255;
 
-         if (greenGlobal > 40)
-                greenGlobal-=2.0;
+  			if (greenGlobal > 40)
+  			       greenGlobal-=2.0;
 
-         if (blueGlobal > 55)
-              blueGlobal-=.5;
+  			if (blueGlobal > 55)
+  			     blueGlobal-=.5;
 
-         if (redGlobal > 162) 
-            transGlobal-=.02;
+  			if (redGlobal > 162) 
+  			   transGlobal-=.02;
 
-         if (reflectance < .5) 
-             reflectance+=.02;
+  		}
+
+
+         if (reflectance < .7) 
+             reflectance+=reflrate;
+
+         if (reflrate > 0.005)
+         	reflrate -= 0.0004;
          
     }
     else {
@@ -1254,7 +1263,7 @@ void update(int value)
     
     updatePrecip();
 
-    if (counter > 100) 
+
     updateTree();
     // fprintf(stderr,"%d\n", counter);
 
