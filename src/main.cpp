@@ -129,15 +129,15 @@ void initLights(void)
 
 void setupRC()
 {
-	tbInit(GLUT_RIGHT_BUTTON);
-	tbAnimate(GL_TRUE);
+	// tbInit(GLUT_RIGHT_BUTTON);
+	// tbAnimate(GL_TRUE);
 
 	// Place Camera
 	camRotX = 750.0f;  //350, 800 was about vertical looking down
 	camRotY = 680.0f; //680
-	camPosX = 0.0f;
-	camPosY = 0.0f;
-	camPosZ = -40.5f;   //-10.5
+	camPosX = -2.0f;
+	camPosY = 13.0f;
+	camPosZ = -25.5f;   //-10.5
 
 	glEnable(GL_DEPTH_TEST);
 	//glShadeModel(GL_SMOOTH);
@@ -259,7 +259,7 @@ void drawBox( GLfloat height, GLfloat width )
 
 void setCamera( void )
 {
-	glTranslatef(0, 0, camPosZ);
+	glTranslatef(camPosX, camPosY, camPosZ);
 	glRotatef(camRotX, 1, 0, 0);
 	glRotatef(camRotY, 0, 1, 0);
 
@@ -916,7 +916,7 @@ void display( void )
 	{
 
 		setCamera();
-		tbMatrix();
+		// tbMatrix();
 
 		drawScene();
 
@@ -934,7 +934,7 @@ void display( void )
 
 void reshape( int w, int h )
 {
-	tbReshape(w, h);
+	// tbReshape(w, h);
 
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
@@ -1060,7 +1060,7 @@ void processSelection(int xPos, int yPos)
 		glPushMatrix();    
 		{
 			setCamera();
-			tbMatrixForSelection();
+			// tbMatrixForSelection();
 
 			drawScene();
 		}
@@ -1099,7 +1099,7 @@ void processSelection(int xPos, int yPos)
 
 void mouse( int button, int state, int x, int y)
 {
-	tbMouse(button, state, x, y);
+	// tbMouse(button, state, x, y);
 
 	// if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	// 	processSelection(x, y);
@@ -1113,7 +1113,7 @@ void mouse( int button, int state, int x, int y)
 
 void motion(int x, int y)
 {
-	tbMotion(x, y);
+	// tbMotion(x, y);
 
 	GLfloat winX, winY, winZ;
 	GLdouble posX, posY, posZ;
@@ -1208,16 +1208,14 @@ void update(int value)
     // fprintf(stderr,"%d\n", counter);
 
 	//SET DIFF CAMERA POSITIONS AND CONDITIONS
-	if (camRotX > 730) {
-		camRotX-= .09;
-	//	camRotY+= .3;
+	if (counter < 125) {
+		camRotX-= .11;
+		camPosY -= .07;
+		camPosZ -=.05;
 	}
-	if (camRotY < 692) {
-		camRotY+= .07;
-		//camPosZ += .2;
-	}
-	if (camPosZ < -19) {
-	//	camPosZ +=.07;
+	else if (counter < 300){
+		camRotX += .03;
+		camPosZ -= .08;
 	}
 	display();
 	glutTimerFunc(20, update, 0);
