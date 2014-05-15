@@ -1256,6 +1256,8 @@ void updateTree( void )
 
 }
 
+GLfloat deltaZ = 0.06;
+GLfloat deltaX = 0.1;
 
 void update(int value)
 {
@@ -1273,9 +1275,15 @@ void update(int value)
 		camPosY -= .07;
 		camPosZ -=.05;
 	}
-	else if (counter < 300){
-		camRotX += .03;
-		camPosZ -= .08;
+	else if (counter < 600){
+		camRotX += deltaX;
+		camPosZ -= deltaZ;
+        deltaX -= 0.0006;
+        deltaZ -= 0.0002;
+        if (deltaX < 0)
+            deltaX = 0.0;
+        if (deltaZ < 0)
+            deltaZ = 0.0;
 	}
 	display();
 	glutTimerFunc(20, update, 0);

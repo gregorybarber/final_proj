@@ -110,10 +110,12 @@ const char* floorFS = STRINGIFY(
 
 		vec4 sourceColor;
 
-		if (refl > reflectance)
-			sourceColor = vec4((amb + dif).rgb, 1.0);
-		else
-			sourceColor = vec4((amb + dif).rgb, refl + 1.0 - reflectance);
+		float alpha = clamp(refl + 1.0 - reflectance, 0.5, 1.0);
+
+		// if (refl > reflectance)
+			// sourceColor = vec4((amb + dif).rgb, 1.0);
+		// else
+			sourceColor = vec4((amb + dif).rgb, alpha);
 
 		float dist = length(vertex);
 		float fogfac = (dist - minFogRadius) / (maxFogRadius - minFogRadius);
@@ -276,16 +278,11 @@ const char* roofFS = STRINGIFY(
 
 		vec4 cubeSample = textureCube(cubeMap, refl); \n
 
-		vec4 sourceColor;
+		vec4 sourceColor;\n
 
-		if (alpha > reflectance) \n
-			sourceColor = ground; \n
-		else { \n
+		float a = clamp(alpha + 1.0 - reflectance, 0.5, 1.0);\n
 
-			// gl_FragColor = vec4((amb + dif).rgb, alpha + 1.0 - reflectance);
-			sourceColor = mix(cubeSample, ground, alpha + 1.0 - reflectance);
-			// gl_FragColor = cubeSample; \n
-		} \n
+		sourceColor = mix(cubeSample, ground, a);
 
 		float dist = length(vertex);
 		float fogfac = (dist - minFogRadius) / (maxFogRadius - minFogRadius);
